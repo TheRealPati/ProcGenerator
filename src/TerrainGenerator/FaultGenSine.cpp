@@ -1,7 +1,7 @@
 #include "FaultGenSine.hpp"
 
-FaultGenSine::FaultGenSine(int surfaceSideSize, int density)
-: TerrainGenAlgo(surfaceSideSize, density)
+FaultGenSine::FaultGenSine(int surfaceSideSize, int density, Randomizer& randomizer)
+: TerrainGenAlgo(surfaceSideSize, density, randomizer)
 {}
 
 FaultGenSine::~FaultGenSine(){}

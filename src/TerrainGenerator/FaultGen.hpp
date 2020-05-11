@@ -10,7 +10,7 @@ class FaultGen : public TerrainGenAlgo
 {
 private:
 public:
-    FaultGen(int surfaceSideSize, int density);
+    FaultGen(int surfaceSideSize, int density, Randomizer& randomizer);
     ~FaultGen();
     void modifyTerrain(std::vector<VertexPNT>& vertices);
 };

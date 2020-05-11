@@ -1,20 +1,19 @@
 #include "TerrainGenAlgo.hpp"
 
-TerrainGenAlgo::TerrainGenAlgo(int surfaceSideSize, int density) 
-: rd{}, mt{rd()}, dist{0.0, 1.0}, 
-surfaceSideSize(surfaceSideSize), density(density)
+TerrainGenAlgo::TerrainGenAlgo(int surfaceSideSize, int density, Randomizer& randomizer) 
+: randomizer(randomizer), surfaceSideSize(surfaceSideSize), density(density)
 {}
 
 TerrainGenAlgo::~TerrainGenAlgo(){}
 
 double TerrainGenAlgo::rand() 
 {
-    return this->dist(mt);
+    return randomizer.rand();
 }
 
 double TerrainGenAlgo::randCenterZero() 
 {
-    return this->dist(mt) - 0.5f;
+    return randomizer.randCenterZero();
 }
 
 void TerrainGenAlgo::modifyTerrain(std::vector<VertexPNT>& vertices){}
@@ -25,10 +24,10 @@ std::vector<VertexPNT> TerrainGenAlgo::generateVertices()
 
     for(unsigned int i = 0; i < surfaceSideSize; i++){
         for(unsigned int j = 0; j < surfaceSideSize; j++){
-                VertexPNT pc;
-                pc.position = {(float)i/density - surfaceSideSize/density/2, 0.0f, (float)j/density - surfaceSideSize/density/2};
-                pc.texCoords = {1.0f/surfaceSideSize*i, 1.0f/surfaceSideSize*j};
-                vertexData.push_back(pc);
+            VertexPNT pc;
+            pc.position = {(float)i/density - surfaceSideSize/density/2, 0.0f, (float)j/density - surfaceSideSize/density/2};
+            pc.texCoords = {1.0f/surfaceSideSize*i, 1.0f/surfaceSideSize*j};
+            vertexData.push_back(pc);
         }
     }
 

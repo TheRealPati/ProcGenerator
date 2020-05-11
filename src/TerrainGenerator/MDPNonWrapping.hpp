@@ -11,7 +11,7 @@ class MDPNonWrapping : public TerrainGenAlgo
 private:
     void step(std::vector<std::vector<VertexPNT>>& vertices, int currentLength, int min_x, int max_x, int min_z, int max_z, float disp);
 public:
-    MDPNonWrapping(int surfaceSideSize, int density);
+    MDPNonWrapping(int surfaceSideSize, int density, Randomizer& randomizer);
     ~MDPNonWrapping();
     void modifyTerrain(std::vector<VertexPNT>& vertices);
 };

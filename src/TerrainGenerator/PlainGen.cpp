@@ -1,7 +1,7 @@
 #include "PlainGen.hpp"
 
-PlainGen::PlainGen(int surfaceSideSize, int density)
-: TerrainGenAlgo(surfaceSideSize, density)
+PlainGen::PlainGen(int surfaceSideSize, int density, Randomizer& randomizer)
+: TerrainGenAlgo(surfaceSideSize, density, randomizer)
 {}
 
 PlainGen::~PlainGen(){}

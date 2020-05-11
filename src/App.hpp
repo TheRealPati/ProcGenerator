@@ -24,6 +24,7 @@
 #include "TerrainGenerator/CircleGen.hpp"
 #include "TerrainGenerator/MDPNonWrapping.hpp"
 #include "TerrainGenerator/MDPWrapping.hpp"
+#include "TerrainGenerator/ObjectScatterer.hpp"
 
 #include "Objects/Camera.hpp"
 #include "Objects/PointLight.hpp"
@@ -65,8 +66,8 @@ private:
     float yaw = 0.0f;
     float pitch = 0.0f;
 
-    TerrainAlgorithm terrainGenerator = TerrainAlgorithm::FAULT;
-    std::vector<VertexPNT> surfaceVertexData;
+    TerrainAlgorithm terrainGenerator = TerrainAlgorithm::MDP_NON_WRAP;
+    ObjectScatterer* scatterer;
     glm::mat4 projection;
 
     GLFWwindow* window;

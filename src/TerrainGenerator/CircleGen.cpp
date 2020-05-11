@@ -1,7 +1,7 @@
 #include "CircleGen.hpp"
 
-CircleGen::CircleGen(int surfaceSideSize, int density)
-: TerrainGenAlgo(surfaceSideSize, density)
+CircleGen::CircleGen(int surfaceSideSize, int density, Randomizer& randomizer)
+: TerrainGenAlgo(surfaceSideSize, density, randomizer)
 {}
 
 CircleGen::~CircleGen(){}

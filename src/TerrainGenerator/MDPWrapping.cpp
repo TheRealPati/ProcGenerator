@@ -1,7 +1,7 @@
 #include "MDPWrapping.hpp"
 
-MDPWrapping::MDPWrapping(int surfaceSideSize, int density)
-: TerrainGenAlgo(surfaceSideSize, density)
+MDPWrapping::MDPWrapping(int surfaceSideSize, int density, Randomizer& randomizer)
+: TerrainGenAlgo(surfaceSideSize, density, randomizer)
 {}
 
 MDPWrapping::~MDPWrapping(){}
@@ -126,8 +126,8 @@ void MDPWrapping::modifyTerrain(std::vector<VertexPNT>& vertices)
     {
         std::vector<std::vector<VertexPNT>> vertices2D = {};
         int j = 0;
+        std::vector<VertexPNT> row = {};
         for(unsigned int i = 0; i < vertices.size(); i++) {
-            std::vector<VertexPNT> row = {};
             VertexPNT pc;
             pc.position.x = (float)(i%surfaceSideSize)/density;
             pc.position.z = (float)j/density;

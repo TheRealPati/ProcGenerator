@@ -91,7 +91,7 @@ int App::initWindow()
         return EXIT_FAILURE;
     }
 
-    // enable OpenGL debug context if context allows for debug context
+    // Enable OpenGL debug context if context allows for debug context
     int flags; 
     glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
     if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
@@ -125,26 +125,30 @@ void App::createMaterials()
 void App::generateTerrain()
 {
     //Gen algorithm
+    Randomizer randomizer = Randomizer();
     TerrainGenAlgo* generator;
+    scatterer = new ObjectScatterer(randomizer);
     int surfaceSideSize = 257;
     //int surfaceSideSize = 50;
     int density = 4;
     if(terrainGenerator == TerrainAlgorithm::PLAIN)
-        generator = new PlainGen(surfaceSideSize, density);
+        generator = new PlainGen(surfaceSideSize, density, randomizer);
     else if(terrainGenerator == TerrainAlgorithm::FAULT)
-        generator = new FaultGen(surfaceSideSize, density);
+        generator = new FaultGen(surfaceSideSize, density, randomizer);
     else if(terrainGenerator == TerrainAlgorithm::SINE)
-        generator = new FaultGenSine(surfaceSideSize, density);
+        generator = new FaultGenSine(surfaceSideSize, density, randomizer);
     else if(terrainGenerator == TerrainAlgorithm::CIRCLE)
-        generator = new CircleGen(surfaceSideSize, density);
+        generator = new CircleGen(surfaceSideSize, density, randomizer);
     else if(terrainGenerator == TerrainAlgorithm::MDP_NON_WRAP)
-        generator = new MDPNonWrapping(surfaceSideSize, density);
+        generator = new MDPNonWrapping(surfaceSideSize, density, randomizer);
     else if(terrainGenerator == TerrainAlgorithm::MDP_WRAP)
-        generator = new MDPWrapping(surfaceSideSize, density);
+        generator = new MDPWrapping(surfaceSideSize, density, randomizer);
 
     fprintf(stderr, "[INFO] Surface creating...\n");
-    surfaceVertexData = generator->generateVertices();
+    std::vector<VertexPNT> surfaceVertexData = generator->generateVertices();
     std::vector<GLuint> indices = generator->generateIndices();
+    //Feeding scatterer with surfaceData
+    scatterer->feedSurfaceData(surfaceVertexData, surfaceSideSize, density);
     // Creating our surface
     Mesh* surfaceMesh = new Mesh(surfaceVertexData, indices);
     Model* surfaceModel = new Model();
@@ -167,17 +171,17 @@ void App::sceneSetup()
     generateTerrain();
 
     dirLight = new DirectionalLight(glm::vec3(10.0f, -10.0f, 0.0f));
-    dirLight->setLightColor(glm::vec3(0.05f), glm::vec3(0.3f), glm::vec3(0.8f));
+    dirLight->setLightColor(glm::vec3(0.05f), glm::vec3(0.03f), glm::vec3(0.08f));
 
     //TODO surfaceVertexDatából venni és néhány pontra odahelyezni
-    lights[0] = new PointLight(glm::vec3(0.0f, 0.0f, 20.0f));
-    lights[1] = new PointLight(glm::vec3(0.0f, 0.0f, 0.0f));
-    lights[2] = new PointLight(glm::vec3(20.0f, 0.0f, 20.0f));
-    lights[3] = new PointLight(glm::vec3(0.0f, 0.0f, 0.0f));
+    lights[0] = new PointLight(glm::vec3(30.0f, scatterer->getHeight(30.0f, 20.0f)+5.0f, 20.0f));
+    lights[1] = new PointLight(glm::vec3(19.0f, scatterer->getHeight(19.0f, 53.0f)+5.0f, 53.0f));
+    lights[2] = new PointLight(glm::vec3(23.0f, scatterer->getHeight(23.0f, 17.0f)+5.0f, 17.0f));
+    lights[3] = new PointLight(glm::vec3(48.0f,scatterer->getHeight(48.0f, 12.0f)+5.0f, 12.0f));
 
     for(int i=0; i<4; i++){
-        lights[i]->setLightColor(glm::vec3(1.0f), glm::vec3(0.2f), glm::vec3(0.8f));
-        lights[i]->setLightIntensity(1.0f, 0.35, 0.44f);
+        lights[i]->setLightColor(glm::vec3(0.05f), glm::vec3(0.3f), glm::vec3(0.4f));
+        lights[i]->setLightIntensity(1.0f, 0.7, 0.07f);
         //7 distance 0.7 1.8
         //13 distance 0.35 0.44
         //32 distance 0.14 0.07

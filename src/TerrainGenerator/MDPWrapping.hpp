@@ -13,7 +13,7 @@ private:
     std::vector<int> sideStep(std::vector<std::vector<VertexPNT>>& vertices, int& currentLength, std::vector<int>& corners, float disp);
 
 public:
-    MDPWrapping(int surfaceSideSize, int density);
+    MDPWrapping(int surfaceSideSize, int density, Randomizer& randomizer);
     ~MDPWrapping();
     void modifyTerrain(std::vector<VertexPNT>& vertices);
 };

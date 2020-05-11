@@ -8,7 +8,7 @@ class PlainGen : public TerrainGenAlgo
 {
 private:
 public:
-    PlainGen(int surfaceSideSize, int density);
+    PlainGen(int surfaceSideSize, int density, Randomizer& randomizer);
     ~PlainGen();
     void modifyTerrain(std::vector<VertexPNT>& vertices);
 };

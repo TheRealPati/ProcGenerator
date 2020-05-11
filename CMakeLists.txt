@@ -34,8 +34,8 @@ endif()
 configure_file(config/filesystem.hpp.in src/Include/filesystem.hpp)
 include_directories("${CMAKE_SOURCE_DIR}/src")
 
-file(GLOB PROJECT_HEADERS src/Include/*.hpp src/Core/*.hpp src/Objects/*.hpp src/TerrainGenerator/*.hpp src/*.hpp)
-file(GLOB PROJECT_SOURCES src/Include/*.cpp src/Core/*.cpp src/Objects/*.cpp src/TerrainGenerator/*.cpp src/*.cpp)
+file(GLOB PROJECT_HEADERS src/DataStructures/*.hpp src/Include/*.hpp src/Core/*.hpp src/Objects/*.hpp src/TerrainGenerator/*.hpp src/*.hpp)
+file(GLOB PROJECT_SOURCES src/DataStructures/*.cpp src/Include/*.cpp src/Core/*.cpp src/Objects/*.cpp src/TerrainGenerator/*.cpp src/*.cpp)
 file(GLOB PROJECT_SHADERS src/shader/*.comp
                           src/shader/*.frag
                           src/shader/*.geom

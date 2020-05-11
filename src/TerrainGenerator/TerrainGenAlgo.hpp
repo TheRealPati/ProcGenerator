@@ -1,16 +1,13 @@
 #pragma once
 
 #include <vector>
-#include <random>
 #include <iostream>
 #include "Utils.hpp"
 
 class TerrainGenAlgo
 {
 private:
-    std::random_device rd;
-    std::mt19937 mt;
-    std::uniform_real_distribution<float> dist;
+    Randomizer& randomizer;
 
 protected:
     unsigned int surfaceSideSize;
@@ -18,7 +15,7 @@ protected:
 
     
 public:
-    TerrainGenAlgo(int surfaceSideSize, int density);
+    TerrainGenAlgo(int surfaceSideSize, int density, Randomizer& rand);
     virtual void modifyTerrain(std::vector<VertexPNT>& vertices);
     ~TerrainGenAlgo();
 

@@ -10,7 +10,7 @@ class CircleGen : public TerrainGenAlgo
 {
 private:
 public:
-    CircleGen(int surfaceSideSize, int density);
+    CircleGen(int surfaceSideSize, int density, Randomizer& randomizer);
     ~CircleGen();
     void modifyTerrain(std::vector<VertexPNT>& vertices);
 };
