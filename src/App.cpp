@@ -1,6 +1,6 @@
 #include "App.hpp"
 
-App::App()
+App::App(Randomizer& randomizer) : randomizer(randomizer)
 {
     glfwInit();
     deltaTime = 0.0f;
@@ -114,23 +114,26 @@ int App::initWindow()
 void App::createMaterials()
 {
     //Creating mats
-    fprintf(stderr, "[INFO] Texture files opening...\n");
     Material* surfaceMat = new Material(shaderPrograms.at("basic"));
     surfaceMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"));
     surfaceMat->setMaterialProps(glm::vec3(0.2f), 32);
     materials.insert(std::pair<std::string, Material*>("surface", surfaceMat));
-    fprintf(stderr, "[INFO] Materials loaded!\n");
+    Material* rainbowMat = new Material(shaderPrograms.at("skinning"));
+    rainbowMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"));
+    rainbowMat->setMaterialProps(glm::vec3(0.2f), 16);
+    materials.insert(std::pair<std::string, Material*>("rainbow", rainbowMat));
 }
 
 void App::generateTerrain()
 {
     //Gen algorithm
-    Randomizer randomizer = Randomizer();
     TerrainGenAlgo* generator;
     scatterer = new ObjectScatterer(randomizer);
     int surfaceSideSize = 257;
     //int surfaceSideSize = 50;
     int density = 4;
+    maxSideSize = surfaceSideSize / density;
+
     if(terrainGenerator == TerrainAlgorithm::PLAIN)
         generator = new PlainGen(surfaceSideSize, density, randomizer);
     else if(terrainGenerator == TerrainAlgorithm::FAULT)
@@ -144,40 +147,89 @@ void App::generateTerrain()
     else if(terrainGenerator == TerrainAlgorithm::MDP_WRAP)
         generator = new MDPWrapping(surfaceSideSize, density, randomizer);
 
-    fprintf(stderr, "[INFO] Surface creating...\n");
     std::vector<VertexPNT> surfaceVertexData = generator->generateVertices();
     std::vector<GLuint> indices = generator->generateIndices();
     //Feeding scatterer with surfaceData
-    scatterer->feedSurfaceData(surfaceVertexData, surfaceSideSize, density);
+    scatterer->feedSurfaceData(surfaceVertexData, maxSideSize);
     // Creating our surface
-    Mesh* surfaceMesh = new Mesh(surfaceVertexData, indices);
+    Mesh* surfaceMesh = new SolidMesh(surfaceVertexData, indices);
     Model* surfaceModel = new Model();
     surfaceModel->addMesh(surfaceMesh);
     surfaceModel->addMat(materials["surface"], 0);
 
     GameObject* surfaceObject = new GameObject();
     surfaceObject->setModel(surfaceModel);
-    fprintf(stderr, "[INFO] Surface created!\n");
 
     objects.push_back(surfaceObject);
+}
+
+void App::generatePlaces()
+{
+    for(int i = 0; i < 10; i++){
+        float x = randomizer.rand() * maxSideSize;
+        float z = randomizer.rand() * maxSideSize;
+        float y = scatterer->getHeight(x,z) + 2.0f;
+        places.emplace_back(glm::translate(glm::mat4(1.0f), glm::vec3(x,y,z)));
+    }
+}
+
+void App::generateCubes()
+{    
+    std::vector<InstanceInfo> instanceInfos = {};
+    for(unsigned int i = 0; i < 10; i++)
+    {
+        InstanceInfo info;
+        info.boneIndices = glm::vec4(0.0f);
+        info.weights = glm::vec4(0.0f);
+        info.modelMatIndex = (float)i;
+        instanceInfos.emplace_back(info);
+    }
+
+    Cube cube = Cube(0.1f);
+    RiggedMesh* cubeMesh = new RiggedMesh(cube.getVertexData(), cube.getIndexData(), instanceInfos);
+
+    // Creating our surface
+    Model* cubeModel = new Model();
+    cubeModel->addMesh(cubeMesh);
+    cubeModel->addMat(materials["rainbow"], 0);
+
+    GameObject* cubeObject = new GameObject();
+    cubeObject->setInstanceCount(10);
+    cubeObject->setModel(cubeModel);
+
+    objects.push_back(cubeObject);
 }
 
 void App::sceneSetup()
 {
     camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    projection = glm::perspective(glm::radians(45.0f), 3.0f/4.0f, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
 
+    fprintf(stderr, "[INFO] Texture files opening...\n");
     createMaterials();
-    generateTerrain();
+    fprintf(stderr, "[INFO] Materials loaded!\n");
 
+    fprintf(stderr, "[INFO] Surface creating...\n");
+    generateTerrain();
+    fprintf(stderr, "[INFO] Surface created!\n");
+
+    fprintf(stderr, "[INFO] Positioning objects...\n");
+    generatePlaces();
+
+    fprintf(stderr, "[INFO] Cubes creating...\n");
+    generateCubes();
+    fprintf(stderr, "[INFO] Cubes spawned!\n");
+
+    fprintf(stderr, "[INFO] Objects loaded!\n");
+
+    fprintf(stderr, "[INFO] Making some light!\n");
     dirLight = new DirectionalLight(glm::vec3(10.0f, -10.0f, 0.0f));
     dirLight->setLightColor(glm::vec3(0.05f), glm::vec3(0.03f), glm::vec3(0.08f));
 
-    //TODO surfaceVertexDatából venni és néhány pontra odahelyezni
     lights[0] = new PointLight(glm::vec3(30.0f, scatterer->getHeight(30.0f, 20.0f)+5.0f, 20.0f));
     lights[1] = new PointLight(glm::vec3(19.0f, scatterer->getHeight(19.0f, 53.0f)+5.0f, 53.0f));
     lights[2] = new PointLight(glm::vec3(23.0f, scatterer->getHeight(23.0f, 17.0f)+5.0f, 17.0f));
-    lights[3] = new PointLight(glm::vec3(48.0f,scatterer->getHeight(48.0f, 12.0f)+5.0f, 12.0f));
+    lights[3] = new PointLight(glm::vec3(48.0f, scatterer->getHeight(48.0f, 12.0f)+5.0f, 12.0f));
 
     for(int i=0; i<4; i++){
         lights[i]->setLightColor(glm::vec3(0.05f), glm::vec3(0.3f), glm::vec3(0.4f));
@@ -209,13 +261,27 @@ void App::sceneSetup()
     spotUbo->preserveSpotLight();
     spotUbo->setSpotLights(spotLight);
     
-    fprintf(stderr, "[INFO] Objects loaded!\n");
+    fprintf(stderr, "[INFO] Lights functioning!\n");
+
+    fprintf(stderr, "[INFO] Be prepared. Only some last magic left!\n");
+    modelMatrixes = new ShaderStorageBuffer(4);
+    modelMatrixes->preserveModelMat(10);
+    for(int i = 0; i < 10; i++){
+        glm::mat4 normalMatrix = glm::inverse(glm::transpose(places[i] * camera->getView()));
+        modelMatrixes->setModelMat(places[i], normalMatrix, i);
+    }
+
+    fprintf(stderr, "[INFO] Okay, okay you should be ready.\n");
 
 }
 
 void App::bindUniforms()
 {
     matrixUbo->setVPmatrix(camera->getView(), projection);
+    for(int i = 0; i < 10; i++){
+        glm::mat4 normalMatrix = glm::inverse(glm::transpose(places[i] * camera->getView()));
+        modelMatrixes->setModelMat(places[i], normalMatrix, i);
+    }
 }
 
 void App::initShaders()
@@ -224,6 +290,9 @@ void App::initShaders()
     std::string basicFS = FileSystem::getPath("resources/shaders/basicFs.glsl");
     Shader* basicShader = new Shader(basicVS, basicFS);
     shaderPrograms.insert(std::pair<std::string, Shader*>("basic", basicShader));
+    std::string skinningVS = FileSystem::getPath("resources/shaders/skinningVs.glsl");
+    Shader* skinningShader = new Shader(skinningVS, basicFS);
+    shaderPrograms.insert(std::pair<std::string, Shader*>("skinning", skinningShader));
 }
 
 void App::processInput() {
@@ -260,7 +329,6 @@ void App::loop()
         getMouseCoords();
         processInput();
         
-        // Background Fill Color
         glClearColor(0.75f, 0.25f, 0.25f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -270,7 +338,6 @@ void App::loop()
             object->draw(camera);
         }
 
-        // Flip Buffers and Draw
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

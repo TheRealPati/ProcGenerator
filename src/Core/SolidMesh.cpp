@@ -1,6 +1,6 @@
-#include "Mesh.hpp"
+#include "SolidMesh.hpp"
 
-Mesh::Mesh(std::vector<VertexPNT> vertexData, std::vector<GLuint> indices)
+SolidMesh::SolidMesh(std::vector<VertexPNT> vertexData, std::vector<GLuint> indices)
 {
     this->vertexData = vertexData;
     this->indices = indices;
@@ -8,7 +8,7 @@ Mesh::Mesh(std::vector<VertexPNT> vertexData, std::vector<GLuint> indices)
     setup();
 }
 
-void Mesh::setup()
+void SolidMesh::setup()
 {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -38,13 +38,13 @@ void Mesh::setup()
     glBindVertexArray(0);
 }
 
-void Mesh::draw(){
+void SolidMesh::draw(int count){
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 
-Mesh::~Mesh(){
+SolidMesh::~SolidMesh(){
     glDeleteBuffers(1, &EBO);
     glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &VAO);

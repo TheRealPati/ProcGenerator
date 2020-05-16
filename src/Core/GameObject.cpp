@@ -8,7 +8,7 @@ GameObject::GameObject()
 void GameObject::draw(Camera* camera)
 {
     normalMatrix = glm::inverse(glm::transpose(modelMatrix * camera->getView()));
-    model->draw(modelMatrix, normalMatrix, camera->getPos());
+    model->draw(modelMatrix, normalMatrix, camera->getPos(), instanceCount);
 }
 
 void GameObject::setModel(Model* model)
@@ -19,6 +19,11 @@ void GameObject::setModel(Model* model)
 void GameObject::setMatrix(glm::mat4 matrix)
 {
     modelMatrix = matrix;
+}
+
+void GameObject::setInstanceCount(int count)
+{
+    instanceCount = count;
 }
 
 GameObject::~GameObject()

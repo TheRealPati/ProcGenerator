@@ -21,6 +21,7 @@
 #include <assimp/postprocess.h>
 
 #include "Mesh.hpp"
+#include "SolidMesh.hpp"
 #include "Material.hpp"
 
 class Model
@@ -43,6 +44,6 @@ public:
 
     void addMat(Material* mat, GLuint index);
 
-    void draw(glm::mat4& model, glm::mat4& normal, glm::vec3& cameraPos);
+    void draw(glm::mat4& model, glm::mat4& normal, glm::vec3& cameraPos, int count);
     ~Model();
 };

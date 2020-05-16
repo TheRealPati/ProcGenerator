@@ -41,6 +41,13 @@ struct QuadNode
     float z;
 }; 
 
+struct InstanceInfo
+{
+    glm::vec4 boneIndices;
+    glm::vec4 weights;
+    float modelMatIndex;
+};
+
 class Randomizer
 {
 private:

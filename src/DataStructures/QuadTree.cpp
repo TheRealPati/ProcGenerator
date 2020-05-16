@@ -76,7 +76,6 @@ QuadNode* QuadTree::search(float x, float z)
 { 
     if(hasNode && !divided)
     {
-        fprintf(stderr, "Y: %f\n", node->y);
         return node;
     }
     else

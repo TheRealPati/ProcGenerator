@@ -15,19 +15,17 @@
 #include <sstream>
 
 #include "Utils.hpp"
+#include "Mesh.hpp"
 
-class Mesh
+class RiggedMesh : public Mesh
 {
-protected:
-    GLuint VAO;
-    GLuint VBO;
-    GLuint EBO;
-
-    std::vector<VertexPNT> vertexData;
-    std::vector<GLuint> indices;
+private:
+    void setup();
+    std::vector<InstanceInfo> vertexSkinning;
+    GLuint instanceVBO;
 
 public:
-    Mesh(){};
-    virtual void draw(int count) = 0;
-    ~Mesh(){};
+    RiggedMesh(std::vector<VertexPNT> vertexData, std::vector<GLuint> indices, std::vector<InstanceInfo> vertexSkinning);
+    virtual void draw(int count);
+    ~RiggedMesh();
 };

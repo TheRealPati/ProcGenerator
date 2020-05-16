@@ -16,18 +16,13 @@
 
 #include "Utils.hpp"
 
-class Mesh
+class Cube
 {
-protected:
-    GLuint VAO;
-    GLuint VBO;
-    GLuint EBO;
-
-    std::vector<VertexPNT> vertexData;
-    std::vector<GLuint> indices;
-
 public:
-    Mesh(){};
-    virtual void draw(int count) = 0;
-    ~Mesh(){};
+    float scale;
+
+    Cube(float scale);
+    std::vector<VertexPNT> getVertexData();
+    std::vector<GLuint> getIndexData();
+    ~Cube();
 };

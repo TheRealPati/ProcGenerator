@@ -73,7 +73,7 @@ Mesh* Model::createMesh(aiMesh *mesh)
             indices.push_back(face.mIndices[j]);
     }
     
-    return new Mesh(vertexData, indices);
+    return new SolidMesh(vertexData, indices);
 }
 
 void Model::addMat(Material* mat, GLuint index)
@@ -87,7 +87,7 @@ void Model::addMesh(Mesh* mesh)
     meshes.push_back(mesh);
 }
 
-void Model::draw(glm::mat4& model, glm::mat4& normal, glm::vec3& cameraPos)
+void Model::draw(glm::mat4& model, glm::mat4& normal, glm::vec3& cameraPos, int count)
 {
     for(unsigned int i = 0; i < meshes.size(); i++)
     {
@@ -95,7 +95,7 @@ void Model::draw(glm::mat4& model, glm::mat4& normal, glm::vec3& cameraPos)
         materials[index]->draw();
         materials[index]->setCameraPos(cameraPos);
         materials[index]->setModelMatrix(model, normal);
-        meshes[i]->draw();
+        meshes[i]->draw(count);
     }
 }
 

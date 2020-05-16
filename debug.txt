@@ -1,0 +1,5 @@
+Scanning dependencies of target ProcGenOnlab
+[  3%] Building CXX object CMakeFiles/ProcGenOnlab.dir/src/App.cpp.o
+[  7%] Building CXX object CMakeFiles/ProcGenOnlab.dir/src/Core/RiggedMesh.cpp.o
+[ 11%] Linking CXX executable build/ProcGenOnlab
+[100%] Built target ProcGenOnlab

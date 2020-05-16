@@ -4,10 +4,9 @@ ObjectScatterer::ObjectScatterer(Randomizer& randomizer)
 : randomizer(randomizer)
 {}
 
-void ObjectScatterer::feedSurfaceData(std::vector<VertexPNT> surfaceData, int surfaceSideSize, int density)
+void ObjectScatterer::feedSurfaceData(std::vector<VertexPNT> surfaceData, float maxSideSize)
 {
-    float corner = surfaceSideSize/density;
-    qtree = new QuadTree(0, 0, corner, corner);
+    qtree = new QuadTree(0, 0, maxSideSize, maxSideSize);
     for(auto vertex : surfaceData)
     {
         qtree->insert(new QuadNode({vertex.position.x, vertex.position.y, vertex.position.z}));

@@ -1,10 +1,12 @@
 #include "App.hpp"
+#include "Utils.hpp"
 
 #define PLAIN
 
 int main(int argc, char * argv[]) {
 
-    App app;
+    Randomizer randomizer;
+    App app(randomizer);
     if(app.initWindow() == 1)
         return EXIT_FAILURE;
     app.initShaders();

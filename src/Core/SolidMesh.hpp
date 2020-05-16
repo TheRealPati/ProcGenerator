@@ -15,19 +15,14 @@
 #include <sstream>
 
 #include "Utils.hpp"
+#include "Mesh.hpp"
 
-class Mesh
+class SolidMesh : public Mesh
 {
-protected:
-    GLuint VAO;
-    GLuint VBO;
-    GLuint EBO;
-
-    std::vector<VertexPNT> vertexData;
-    std::vector<GLuint> indices;
-
+private:
+    void setup();
 public:
-    Mesh(){};
-    virtual void draw(int count) = 0;
-    ~Mesh(){};
+    SolidMesh(std::vector<VertexPNT> vertexData, std::vector<GLuint> indices);
+    virtual void draw(int count);
+    ~SolidMesh();
 };

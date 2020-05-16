@@ -31,9 +31,14 @@
 #include "Core/Shader.hpp"
 #include "Core/Material.hpp"
 #include "Core/Mesh.hpp"
+#include "Core/SolidMesh.hpp"
+#include "Core/RiggedMesh.hpp"
 #include "Core/Model.hpp"
 #include "Core/GameObject.hpp"
 #include "Core/UniformObjectBuffer.hpp"
+#include "Core/ShaderStorageBuffer.hpp"
+
+#include "Primitives/Cube.hpp"
 
 #include "Include/filesystem.hpp"
 
@@ -52,8 +57,7 @@ private:
     const int windowWidth = 800;
     const int windowHeight = 600;
 
-    std::string vertexText;
-    std::string fragmentText;
+    Randomizer& randomizer;
 
     std::map<std::string, Shader*> shaderPrograms;
 
@@ -67,7 +71,9 @@ private:
     float pitch = 0.0f;
 
     TerrainAlgorithm terrainGenerator = TerrainAlgorithm::MDP_NON_WRAP;
+    float maxSideSize;
     ObjectScatterer* scatterer;
+    std::vector<glm::mat4> places;
     glm::mat4 projection;
 
     GLFWwindow* window;
@@ -84,9 +90,10 @@ private:
     UniformBufferObject* pointsUbo;
     UniformBufferObject* directionUbo;
     UniformBufferObject* spotUbo;
+    ShaderStorageBuffer* modelMatrixes;
 
 public:
-    App();
+    App(Randomizer& randomizer);
     int initWindow();
     void initShaders();
 
@@ -94,6 +101,8 @@ public:
 
     void createMaterials();
     void generateTerrain();
+    void generatePlaces();
+    void generateCubes();
 
     void bindUniforms();
     void processInput();

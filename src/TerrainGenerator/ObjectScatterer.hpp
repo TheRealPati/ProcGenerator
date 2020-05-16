@@ -17,7 +17,7 @@ protected:
     
 public:
     ObjectScatterer(Randomizer& randomizer);
-    void feedSurfaceData(std::vector<VertexPNT> surfaceData, int surfaceSideSize, int density);
+    void feedSurfaceData(std::vector<VertexPNT> surfaceData, float maxSideSize);
     float getHeight(float x, float z);
     ~ObjectScatterer();
 

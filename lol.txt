@@ -1,7 +1,0 @@
-[100%] Built target ProcGenOnlab
----------------
-Debug message (1): VS SIMD8 shader: 78 inst, 0 loops, 264 cycles, 0:0 spills:fills, 2 sends, scheduled with mode top-down, Promoted 0 constants, compacted 1248 to 1024 bytes.
-Source: Shader Compiler
-Type: Other
-Severity: notification
-
