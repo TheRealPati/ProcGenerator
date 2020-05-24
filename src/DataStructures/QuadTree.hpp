@@ -14,7 +14,7 @@ private:
     float botRightX; 
     float botRightZ; 
 
-    QuadNode* node; 
+    Point* node; 
     bool hasNode = false;
     bool divided = false;
 
@@ -26,8 +26,8 @@ private:
 public:
     QuadTree(float topLeftX, float topLeftZ, float botRightX, float botRightZ);
     ~QuadTree();
-    void insert(QuadNode*); 
+    void insert(Point*); 
     void divide();
-    QuadNode* search(float x, float z); 
+    Point* search(float x, float z); 
     bool inBoundary(float x, float z); 
 };

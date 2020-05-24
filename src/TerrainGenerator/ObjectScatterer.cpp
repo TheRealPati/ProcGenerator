@@ -9,7 +9,7 @@ void ObjectScatterer::feedSurfaceData(std::vector<VertexPNT> surfaceData, float 
     qtree = new QuadTree(0, 0, maxSideSize, maxSideSize);
     for(auto vertex : surfaceData)
     {
-        qtree->insert(new QuadNode({vertex.position.x, vertex.position.y, vertex.position.z}));
+        qtree->insert(new Point({vertex.position.x, vertex.position.y, vertex.position.z}));
     }
     fprintf(stderr, "[INFO] Feeding completed!\n");
 }

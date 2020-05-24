@@ -118,10 +118,21 @@ void App::createMaterials()
     surfaceMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"));
     surfaceMat->setMaterialProps(glm::vec3(0.2f), 32);
     materials.insert(std::pair<std::string, Material*>("surface", surfaceMat));
+
     Material* rainbowMat = new Material(shaderPrograms.at("skinning"));
     rainbowMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"));
     rainbowMat->setMaterialProps(glm::vec3(0.2f), 16);
     materials.insert(std::pair<std::string, Material*>("rainbow", rainbowMat));
+
+    Material* dimwavesMat = new Material(shaderPrograms.at("skinning"));
+    dimwavesMat->loadTexture(FileSystem::getPath("resources/textures/dimensionwaves.jpg"));
+    dimwavesMat->setMaterialProps(glm::vec3(0.2f), 16);
+    materials.insert(std::pair<std::string, Material*>("dimensionwaves", dimwavesMat));
+
+    Material* woodMat = new Material(shaderPrograms.at("skinning"));
+    woodMat->loadTexture(FileSystem::getPath("resources/textures/wood.jpg"));
+    woodMat->setMaterialProps(glm::vec3(0.004f), 256);
+    materials.insert(std::pair<std::string, Material*>("wood", woodMat));
 }
 
 void App::generateTerrain()
@@ -129,7 +140,7 @@ void App::generateTerrain()
     //Gen algorithm
     TerrainGenAlgo* generator;
     scatterer = new ObjectScatterer(randomizer);
-    int surfaceSideSize = 257;
+    int surfaceSideSize = 1025;
     //int surfaceSideSize = 50;
     int density = 4;
     maxSideSize = surfaceSideSize / density;
@@ -165,45 +176,91 @@ void App::generateTerrain()
 
 void App::generatePlaces()
 {
+    RegionSeeder seeder = RegionSeeder(randomizer, 200);
+
+    int j = 0;
     for(int i = 0; i < 10; i++){
         float x = randomizer.rand() * maxSideSize;
         float z = randomizer.rand() * maxSideSize;
-        float y = scatterer->getHeight(x,z) + 2.0f;
-        places.emplace_back(glm::translate(glm::mat4(1.0f), glm::vec3(x,y,z)));
+        float y = scatterer->getHeight(x,z);
+        //places.emplace_back(glm::translate(glm::mat4(1.0f), glm::vec3(x,y,z)));
+
+        //Maxi cubes
+        // InstanceInfo info;
+        // info.boneIndices = glm::vec4(0.0f);
+        // info.weights = glm::vec4(0.0f);
+        // info.modelMatIndex = (float)(i + i * 200);
+        // maxi.emplace_back(info);
+
+        //Mini cubes
+        std::vector<Point> seedPoints = seeder.seed({x,y+5.0f,z}, 6.0f, 12.0f, FrameRegion::SPHERE);
+        // int j = 1;
+        // for(Point point : points)
+        // {
+        //     places.emplace_back(glm::translate(glm::mat4(1.0f), glm::vec3(point.x,point.y,point.z)));
+
+        //     InstanceInfo info;
+        //     info.boneIndices = glm::vec4(0.0f);
+        //     info.weights = glm::vec4(0.0f);
+        //     info.modelMatIndex = (float)(i * 200 + i + j);
+        //     j++;
+        //     mini.emplace_back(info);
+        // }
+
+        SpaceColonization colonization = SpaceColonization(1.4f, 3.0f, seedPoints);
+        std::vector<ColonBranch*> points = colonization.colonize({x,y,z}, {0.0f, 1.0f, 0.0f});
+        for(ColonBranch* point : points)
+        {
+            glm::vec3 axis = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), point->direction);
+            float angle = acos(glm::dot(point->direction, glm::vec3(0.0f, 1.0f, 0.0f)));
+            glm::mat4 rotMat = glm::mat4(1.0f);
+            if(angle != 0)
+                rotMat = glm::rotate(glm::mat4(1.0f), angle, axis);
+            glm::mat4 translateMat = glm::translate(glm::mat4(1.0f), glm::vec3(point->pos.x, point->pos.y, point->pos.z));
+            places.emplace_back(translateMat * rotMat);
+
+            InstanceInfo info;
+            info.boneIndices = glm::vec4(0.0f);
+            info.weights = glm::vec4(0.0f);
+            info.modelMatIndex = (float)(j);
+            j++;
+            mini.emplace_back(info);
+        }
+
     }
 }
 
 void App::generateCubes()
 {    
-    std::vector<InstanceInfo> instanceInfos = {};
-    for(unsigned int i = 0; i < 10; i++)
-    {
-        InstanceInfo info;
-        info.boneIndices = glm::vec4(0.0f);
-        info.weights = glm::vec4(0.0f);
-        info.modelMatIndex = (float)i;
-        instanceInfos.emplace_back(info);
-    }
-
     Cube cube = Cube(0.1f);
-    RiggedMesh* cubeMesh = new RiggedMesh(cube.getVertexData(), cube.getIndexData(), instanceInfos);
+    Cylinder miniCyl = Cylinder(0.05f, 0.15f);
+    RiggedMesh* cubeMesh = new RiggedMesh(cube.getVertexData(), cube.getIndexData(), maxi);
+    RiggedMesh* miniCubeMesh = new RiggedMesh(miniCyl.getVertexData(), miniCyl.getIndexData(), mini);
 
-    // Creating our surface
     Model* cubeModel = new Model();
     cubeModel->addMesh(cubeMesh);
     cubeModel->addMat(materials["rainbow"], 0);
 
+    Model* miniCubeModel = new Model();
+    miniCubeModel->addMesh(miniCubeMesh);
+    miniCubeModel->addMat(materials["wood"], 0);
+
     GameObject* cubeObject = new GameObject();
-    cubeObject->setInstanceCount(10);
+    cubeObject->setInstanceCount(maxi.size());
     cubeObject->setModel(cubeModel);
+    
+    GameObject* miniCubeObject = new GameObject();
+    miniCubeObject->setInstanceCount(mini.size());
+    miniCubeObject->setModel(miniCubeModel);
 
     objects.push_back(cubeObject);
+    objects.push_back(miniCubeObject);
 }
 
 void App::sceneSetup()
 {
     camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 300.0f);
 
     fprintf(stderr, "[INFO] Texture files opening...\n");
     createMaterials();
@@ -226,14 +283,14 @@ void App::sceneSetup()
     dirLight = new DirectionalLight(glm::vec3(10.0f, -10.0f, 0.0f));
     dirLight->setLightColor(glm::vec3(0.05f), glm::vec3(0.03f), glm::vec3(0.08f));
 
-    lights[0] = new PointLight(glm::vec3(30.0f, scatterer->getHeight(30.0f, 20.0f)+5.0f, 20.0f));
-    lights[1] = new PointLight(glm::vec3(19.0f, scatterer->getHeight(19.0f, 53.0f)+5.0f, 53.0f));
-    lights[2] = new PointLight(glm::vec3(23.0f, scatterer->getHeight(23.0f, 17.0f)+5.0f, 17.0f));
-    lights[3] = new PointLight(glm::vec3(48.0f, scatterer->getHeight(48.0f, 12.0f)+5.0f, 12.0f));
+    lights[0] = new PointLight(glm::vec3(10.0f, scatterer->getHeight(10.0f, 10.0f)+2.0f, 10.0f));
+    lights[1] = new PointLight(glm::vec3(20.0f, scatterer->getHeight(20.0f, 20.0f)+2.0f, 20.0f));
+    lights[2] = new PointLight(glm::vec3(30.0f, scatterer->getHeight(30.0f, 30.0f)+2.0f, 30.0f));
+    lights[3] = new PointLight(glm::vec3(48.0f, scatterer->getHeight(40.0f, 40.0f)+2.0f, 40.0f));
 
     for(int i=0; i<4; i++){
-        lights[i]->setLightColor(glm::vec3(0.05f), glm::vec3(0.3f), glm::vec3(0.4f));
-        lights[i]->setLightIntensity(1.0f, 0.7, 0.07f);
+        lights[i]->setLightColor(glm::vec3(0.05f), glm::vec3(0.3f), glm::vec3(0.9f));
+        lights[i]->setLightIntensity(1.0f, 0.7, 0.17f);
         //7 distance 0.7 1.8
         //13 distance 0.35 0.44
         //32 distance 0.14 0.07
@@ -265,13 +322,13 @@ void App::sceneSetup()
 
     fprintf(stderr, "[INFO] Be prepared. Only some last magic left!\n");
     modelMatrixes = new ShaderStorageBuffer(4);
-    modelMatrixes->preserveModelMat(10);
-    for(int i = 0; i < 10; i++){
-        glm::mat4 normalMatrix = glm::inverse(glm::transpose(places[i] * camera->getView()));
+    modelMatrixes->preserveModelMat(maxi.size() + mini.size());
+    for(int i = 0; i < maxi.size() + mini.size(); i++){
+        glm::mat4 normalMatrix = glm::transpose(glm::inverse(places[i]));
         modelMatrixes->setModelMat(places[i], normalMatrix, i);
     }
 
-    fprintf(stderr, "[INFO] Okay, okay you should be ready.\n");
+    fprintf(stderr, "[INFO] Okay, okay, should be ready.\n");
 
 }
 
@@ -279,7 +336,7 @@ void App::bindUniforms()
 {
     matrixUbo->setVPmatrix(camera->getView(), projection);
     for(int i = 0; i < 10; i++){
-        glm::mat4 normalMatrix = glm::inverse(glm::transpose(places[i] * camera->getView()));
+        glm::mat4 normalMatrix = glm::transpose(glm::inverse(places[i]));
         modelMatrixes->setModelMat(places[i], normalMatrix, i);
     }
 }
@@ -310,7 +367,7 @@ void App::processInput() {
         camera->move(KeyboardDirection::RIGHT, deltaTime);
 
     if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera->setSpeed(8.0f);
+        camera->setSpeed(30.0f);
     else
         camera->setSpeed(2.0f);
 }

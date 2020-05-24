@@ -10,10 +10,6 @@ class ObjectScatterer
 private:
     Randomizer& randomizer;
     QuadTree* qtree;
-
-protected:
-    unsigned int surfaceSideSize;
-    unsigned int density;
     
 public:
     ObjectScatterer(Randomizer& randomizer);

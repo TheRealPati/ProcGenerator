@@ -12,6 +12,7 @@ private:
 protected:
     unsigned int surfaceSideSize;
     unsigned int density;
+    unsigned int smoothFilter = 0;
 
     
 public:
@@ -22,6 +23,8 @@ public:
     std::vector<VertexPNT> generateVertices();
     std::vector<GLuint> generateIndices();
     void genNormals(std::vector<VertexPNT>& vertices);
+    void setSmoothFilter(unsigned int count);
+    void smoothing(std::vector<VertexPNT>& vertices);
 
     double rand();
     double randCenterZero();

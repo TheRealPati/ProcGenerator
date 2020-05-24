@@ -33,6 +33,6 @@ void main(){
     modelPosition = (matrixes[int(modelMatIndex)].model * vec4(vertexPos, 1.0)).xyz;
 
     gl_Position = finalPosition;
-    normal = normalize(matrixes[int(modelMatIndex)].normal * vec4(vertexNormal, 1.0)).xyz;
+    normal = normalize(matrixes[int(modelMatIndex)].normal * vec4(vertexNormal, 0.0)).xyz;
     texCoords = vertexTex;
 }

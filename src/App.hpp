@@ -3,6 +3,7 @@
 #define GL_GLEXT_PROTOTYPES
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/euler_angles.hpp>
 #include <GLFW/glfw3.h>
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -39,6 +40,10 @@
 #include "Core/ShaderStorageBuffer.hpp"
 
 #include "Primitives/Cube.hpp"
+#include "Primitives/Cylinder.hpp"
+
+#include "Algorithm/RegionFrames/RegionSeeder.hpp"
+#include "Algorithm/SpaceColonization.hpp"
 
 #include "Include/filesystem.hpp"
 
@@ -70,7 +75,7 @@ private:
     float yaw = 0.0f;
     float pitch = 0.0f;
 
-    TerrainAlgorithm terrainGenerator = TerrainAlgorithm::MDP_NON_WRAP;
+    TerrainAlgorithm terrainGenerator = TerrainAlgorithm::MDP_WRAP;
     float maxSideSize;
     ObjectScatterer* scatterer;
     std::vector<glm::mat4> places;
@@ -91,6 +96,10 @@ private:
     UniformBufferObject* directionUbo;
     UniformBufferObject* spotUbo;
     ShaderStorageBuffer* modelMatrixes;
+
+    //TODO
+    std::vector<InstanceInfo> maxi;
+    std::vector<InstanceInfo> mini;
 
 public:
     App(Randomizer& randomizer);

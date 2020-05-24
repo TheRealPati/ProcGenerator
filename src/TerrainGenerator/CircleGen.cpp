@@ -23,12 +23,6 @@ void CircleGen::modifyTerrain(std::vector<VertexPNT>& vertices)
 		    if (distance < circleSize){
                 vertex.position.y += displacement/2 + cos(0.125*distance*3.14f)*displacement/2;
             }
-		    /*else{
-                vertex.position.y -= displacement;
-                vertex.color.b -= displacement*0.5f;
-                vertex.color.g += displacement*0.3f;
-                vertex.color.r += displacement*0.3f;
-            }*/
         }
         //displacement *= 0.98f;
         displacement -= 0.001f;

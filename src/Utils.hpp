@@ -34,7 +34,7 @@ struct VertexPNT
     glm::vec2 texCoords;
 };
 
-struct QuadNode 
+struct Point 
 { 
     float x;
     float y;
@@ -66,5 +66,10 @@ public:
     double randCenterZero() 
     {
         return this->dist(mt) - 0.5f;
+    }
+
+    double randCenterEqually() 
+    {
+        return (this->dist(mt) - 0.5f) * 2.0f;
     }
 };

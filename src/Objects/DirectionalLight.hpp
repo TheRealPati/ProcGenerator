@@ -29,11 +29,6 @@ public:
     glm::vec3& getAmbient();
     glm::vec3& getDiffuse();
     glm::vec3& getSpecular();
-    float getLightIntensityC();
-    float getLightIntensityL();
-    float getLightIntensityQ();
-    float getLightcutOff();
-    float getLightcutOffOuter();
 
     ~DirectionalLight();
 };

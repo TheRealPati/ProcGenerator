@@ -21,6 +21,6 @@ void main(){
     modelPosition = (model * vec4(vertexPos, 1.0)).xyz;
 
     gl_Position = finalPosition;
-    normal = normalize(normalMatrix * vec4(vertexNormal, 1.0)).xyz;
+    normal = normalize(normalMatrix * vec4(vertexNormal, 0.0)).xyz;
     texCoords = vertexTex;
 }

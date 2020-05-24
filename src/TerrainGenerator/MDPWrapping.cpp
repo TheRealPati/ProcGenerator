@@ -2,7 +2,9 @@
 
 MDPWrapping::MDPWrapping(int surfaceSideSize, int density, Randomizer& randomizer)
 : TerrainGenAlgo(surfaceSideSize, density, randomizer)
-{}
+{
+    setSmoothFilter(1);
+}
 
 MDPWrapping::~MDPWrapping(){}
 
@@ -155,7 +157,7 @@ void MDPWrapping::modifyTerrain(std::vector<VertexPNT>& vertices)
         std::vector<int> corners = {min_x, max_x, min_z, max_z};
 
         int currentLength = surfaceSideSize/2;
-        float disp = 3.0f;
+        float disp = 16.0f;
 
         //Wrapping version
         while(currentLength >= 1)

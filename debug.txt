@@ -1,5 +1,37 @@
 Scanning dependencies of target ProcGenOnlab
-[  3%] Building CXX object CMakeFiles/ProcGenOnlab.dir/src/App.cpp.o
-[  7%] Building CXX object CMakeFiles/ProcGenOnlab.dir/src/Core/RiggedMesh.cpp.o
-[ 11%] Linking CXX executable build/ProcGenOnlab
+[  3%] Building CXX object CMakeFiles/ProcGenOnlab.dir/src/Algorithm/SpaceColonization.cpp.o
+/run/media/pati/1088833A88831CFA/ProcGen/src/Algorithm/SpaceColonization.cpp: In member function ‘void SpaceColonization::leafGrow(ColonBranch*, std::vector<ColonBranch*>&)’:
+/run/media/pati/1088833A88831CFA/ProcGen/src/Algorithm/SpaceColonization.cpp:58:22: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<Point>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+   58 |     for(int i = 0; i < points.size(); i++)
+      |                    ~~^~~~~~~~~~~~~~~
+/run/media/pati/1088833A88831CFA/ProcGen/src/Algorithm/SpaceColonization.cpp:54:47: warning: unused parameter ‘root’ [-Wunused-parameter]
+   54 | void SpaceColonization::leafGrow(ColonBranch* root, std::vector<ColonBranch*>& generatedBranches)
+      |                                  ~~~~~~~~~~~~~^~~~
+[  6%] Linking CXX executable build/ProcGenOnlab
 [100%] Built target ProcGenOnlab
+[INFO] OpenGL 4.6 (Core Profile) Mesa 20.0.6
+[INFO] Texture files opening...
+[INFO] Materials loaded!
+[INFO] Surface creating...
+[INFO] MDP Generating done!
+[INFO] Feeding completed!
+[INFO] Surface created!
+[INFO] Positioning objects...
+Levél fel 
+Levél fel 
+Levél fel 
+Levél fel 
+Levél fel 
+Levél fel 
+Levél fel 
+Levél fel 
+Levél fel 
+Levél fel 
+[INFO] Cubes creating...
+[INFO] Cubes spawned!
+[INFO] Objects loaded!
+[INFO] Making some light!
+[INFO] Lights functioning!
+[INFO] Be prepared. Only some last magic left!
+[INFO] Okay, okay, should be ready.
+[INFO] Clean up done!

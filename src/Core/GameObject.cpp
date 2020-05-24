@@ -7,7 +7,7 @@ GameObject::GameObject()
 
 void GameObject::draw(Camera* camera)
 {
-    normalMatrix = glm::inverse(glm::transpose(modelMatrix * camera->getView()));
+    normalMatrix = glm::transpose(glm::inverse(modelMatrix));
     model->draw(modelMatrix, normalMatrix, camera->getPos(), instanceCount);
 }
 
