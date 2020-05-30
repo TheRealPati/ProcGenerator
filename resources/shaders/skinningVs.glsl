@@ -23,16 +23,39 @@ struct modelMatrixes
     mat4 normal;
 }; 
 
+struct skinningMatrix 
+{
+    mat4 offset;
+}; 
+
 layout(std430, binding = 4) buffer instanceBuffer
 {
     modelMatrixes matrixes[];
 };
 
+layout(std430, binding = 5) buffer skinningBuffer
+{
+    skinningMatrix skinning[];
+};
+
 void main(){
-    vec4 finalPosition = projection * view * matrixes[int(modelMatIndex)].model * vec4(vertexPos, 1.0);
-    modelPosition = (matrixes[int(modelMatIndex)].model * vec4(vertexPos, 1.0)).xyz;
+
+    vec4 skinnedVertexPos = 
+    (skinning[int(boneIndices.x)].offset * vec4(vertexPos, 1.0)) * weights.x +
+    (skinning[int(boneIndices.y)].offset * vec4(vertexPos, 1.0)) * weights.y +
+    (skinning[int(boneIndices.z)].offset * vec4(vertexPos, 1.0)) * weights.z +
+    (skinning[int(boneIndices.w)].offset * vec4(vertexPos, 1.0)) * weights.w;
+
+    vec4 skinnedVertexNormal = 
+    (skinning[int(boneIndices.x)].offset * vec4(vertexNormal, 1.0)) * weights.x +
+    (skinning[int(boneIndices.y)].offset * vec4(vertexNormal, 1.0)) * weights.y +
+    (skinning[int(boneIndices.z)].offset * vec4(vertexNormal, 1.0)) * weights.z +
+    (skinning[int(boneIndices.w)].offset * vec4(vertexNormal, 1.0)) * weights.w;
+
+    vec4 finalPosition = projection * view * matrixes[int(modelMatIndex)].model * skinnedVertexPos;
+    modelPosition = (matrixes[int(modelMatIndex)].model * skinnedVertexPos).xyz;
 
     gl_Position = finalPosition;
-    normal = normalize(matrixes[int(modelMatIndex)].normal * vec4(vertexNormal, 0.0)).xyz;
+    normal = normalize(matrixes[int(modelMatIndex)].normal * skinnedVertexNormal).xyz;
     texCoords = vertexTex;
 }

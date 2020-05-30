@@ -44,7 +44,6 @@ struct Point
 struct InstanceInfo
 {
     glm::vec4 boneIndices;
-    glm::vec4 weights;
     float modelMatIndex;
 };
 

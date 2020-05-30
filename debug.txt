@@ -1,12 +1,12 @@
 Scanning dependencies of target ProcGenOnlab
-[  3%] Building CXX object CMakeFiles/ProcGenOnlab.dir/src/Algorithm/SpaceColonization.cpp.o
-/run/media/pati/1088833A88831CFA/ProcGen/src/Algorithm/SpaceColonization.cpp: In member function ‘void SpaceColonization::leafGrow(ColonBranch*, std::vector<ColonBranch*>&)’:
-/run/media/pati/1088833A88831CFA/ProcGen/src/Algorithm/SpaceColonization.cpp:58:22: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<Point>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
-   58 |     for(int i = 0; i < points.size(); i++)
-      |                    ~~^~~~~~~~~~~~~~~
-/run/media/pati/1088833A88831CFA/ProcGen/src/Algorithm/SpaceColonization.cpp:54:47: warning: unused parameter ‘root’ [-Wunused-parameter]
-   54 | void SpaceColonization::leafGrow(ColonBranch* root, std::vector<ColonBranch*>& generatedBranches)
-      |                                  ~~~~~~~~~~~~~^~~~
+[  3%] Building CXX object CMakeFiles/ProcGenOnlab.dir/src/App.cpp.o
+/run/media/pati/1088833A88831CFA/ProcGen/src/App.cpp: In function ‘void debugMessage(GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar*, const void*)’:
+/run/media/pati/1088833A88831CFA/ProcGen/src/App.cpp:26:83: warning: unused parameter ‘length’ [-Wunused-parameter]
+   26 | void debugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+      |                                                                           ~~~~~~~~^~~~~~
+/run/media/pati/1088833A88831CFA/ProcGen/src/App.cpp:27:54: warning: unused parameter ‘userParam’ [-Wunused-parameter]
+   27 |                   const GLchar *message, const void *userParam)
+      |                                          ~~~~~~~~~~~~^~~~~~~~~
 [  6%] Linking CXX executable build/ProcGenOnlab
 [100%] Built target ProcGenOnlab
 [INFO] OpenGL 4.6 (Core Profile) Mesa 20.0.6
@@ -17,18 +17,6 @@ Scanning dependencies of target ProcGenOnlab
 [INFO] Feeding completed!
 [INFO] Surface created!
 [INFO] Positioning objects...
-Levél fel 
-Levél fel 
-Levél fel 
-Levél fel 
-Levél fel 
-Levél fel 
-Levél fel 
-Levél fel 
-Levél fel 
-Levél fel 
-[INFO] Cubes creating...
-[INFO] Cubes spawned!
 [INFO] Objects loaded!
 [INFO] Making some light!
 [INFO] Lights functioning!

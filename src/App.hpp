@@ -29,6 +29,7 @@
 
 #include "Objects/Camera.hpp"
 #include "Objects/PointLight.hpp"
+#include "Objects/Forest.hpp"
 #include "Core/Shader.hpp"
 #include "Core/Material.hpp"
 #include "Core/Mesh.hpp"
@@ -42,12 +43,10 @@
 #include "Primitives/Cube.hpp"
 #include "Primitives/Cylinder.hpp"
 
-#include "Algorithm/RegionFrames/RegionSeeder.hpp"
-#include "Algorithm/SpaceColonization.hpp"
-
 #include "Include/filesystem.hpp"
 
-enum class TerrainAlgorithm { 
+enum class TerrainAlgorithm 
+{ 
     PLAIN,
     FAULT,
     SINE,
@@ -79,6 +78,7 @@ private:
     float maxSideSize;
     ObjectScatterer* scatterer;
     std::vector<glm::mat4> places;
+    std::vector<glm::mat4> skinning = { glm::mat4(1.0f) };
     glm::mat4 projection;
 
     GLFWwindow* window;
@@ -96,10 +96,7 @@ private:
     UniformBufferObject* directionUbo;
     UniformBufferObject* spotUbo;
     ShaderStorageBuffer* modelMatrixes;
-
-    //TODO
-    std::vector<InstanceInfo> maxi;
-    std::vector<InstanceInfo> mini;
+    ShaderStorageBuffer* skinningMatrixes;
 
 public:
     App(Randomizer& randomizer);
@@ -110,8 +107,8 @@ public:
 
     void createMaterials();
     void generateTerrain();
-    void generatePlaces();
-    void generateCubes();
+    void generateTrees();
+    void generateEntities();
 
     void bindUniforms();
     void processInput();

@@ -174,87 +174,40 @@ void App::generateTerrain()
     objects.push_back(surfaceObject);
 }
 
-void App::generatePlaces()
+void App::generateTrees()
 {
-    RegionSeeder seeder = RegionSeeder(randomizer, 200);
+    Forest* forest = new Forest(randomizer, scatterer, 10);
+    forest->populate(maxSideSize, places, skinning);
 
-    int j = 0;
-    for(int i = 0; i < 10; i++){
-        float x = randomizer.rand() * maxSideSize;
-        float z = randomizer.rand() * maxSideSize;
-        float y = scatterer->getHeight(x,z);
-        //places.emplace_back(glm::translate(glm::mat4(1.0f), glm::vec3(x,y,z)));
+    Mesh* threeWayMesh = forest->getThreeWayMesh();
 
-        //Maxi cubes
-        // InstanceInfo info;
-        // info.boneIndices = glm::vec4(0.0f);
-        // info.weights = glm::vec4(0.0f);
-        // info.modelMatIndex = (float)(i + i * 200);
-        // maxi.emplace_back(info);
+    Model* threeWayModel = new Model();
+    threeWayModel->addMesh(threeWayMesh);
+    threeWayModel->addMat(materials["wood"], 0);
 
-        //Mini cubes
-        std::vector<Point> seedPoints = seeder.seed({x,y+5.0f,z}, 6.0f, 12.0f, FrameRegion::SPHERE);
-        // int j = 1;
-        // for(Point point : points)
-        // {
-        //     places.emplace_back(glm::translate(glm::mat4(1.0f), glm::vec3(point.x,point.y,point.z)));
+    GameObject* threeWayObject = new GameObject();
+    threeWayObject->setInstanceCount(forest->getThreeWayInstances().size());
+    threeWayObject->setModel(threeWayModel);
 
-        //     InstanceInfo info;
-        //     info.boneIndices = glm::vec4(0.0f);
-        //     info.weights = glm::vec4(0.0f);
-        //     info.modelMatIndex = (float)(i * 200 + i + j);
-        //     j++;
-        //     mini.emplace_back(info);
-        // }
+    objects.push_back(threeWayObject);
 
-        SpaceColonization colonization = SpaceColonization(1.4f, 3.0f, seedPoints);
-        std::vector<ColonBranch*> points = colonization.colonize({x,y,z}, {0.0f, 1.0f, 0.0f});
-        for(ColonBranch* point : points)
-        {
-            glm::vec3 axis = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), point->direction);
-            float angle = acos(glm::dot(point->direction, glm::vec3(0.0f, 1.0f, 0.0f)));
-            glm::mat4 rotMat = glm::mat4(1.0f);
-            if(angle != 0)
-                rotMat = glm::rotate(glm::mat4(1.0f), angle, axis);
-            glm::mat4 translateMat = glm::translate(glm::mat4(1.0f), glm::vec3(point->pos.x, point->pos.y, point->pos.z));
-            places.emplace_back(translateMat * rotMat);
+    Mesh* twoWayMesh = forest->getTwoWayMesh();
 
-            InstanceInfo info;
-            info.boneIndices = glm::vec4(0.0f);
-            info.weights = glm::vec4(0.0f);
-            info.modelMatIndex = (float)(j);
-            j++;
-            mini.emplace_back(info);
-        }
+    Model* twoWayModel = new Model();
+    twoWayModel->addMesh(twoWayMesh);
+    twoWayModel->addMat(materials["wood"], 0);
 
-    }
+    GameObject* twoWayObject = new GameObject();
+
+    twoWayObject->setInstanceCount(forest->getTwoWayInstances().size());
+    twoWayObject->setModel(twoWayModel);
+
+    objects.push_back(twoWayObject);
 }
 
-void App::generateCubes()
-{    
-    Cube cube = Cube(0.1f);
-    Cylinder miniCyl = Cylinder(0.05f, 0.15f);
-    RiggedMesh* cubeMesh = new RiggedMesh(cube.getVertexData(), cube.getIndexData(), maxi);
-    RiggedMesh* miniCubeMesh = new RiggedMesh(miniCyl.getVertexData(), miniCyl.getIndexData(), mini);
+void App::generateEntities()
+{
 
-    Model* cubeModel = new Model();
-    cubeModel->addMesh(cubeMesh);
-    cubeModel->addMat(materials["rainbow"], 0);
-
-    Model* miniCubeModel = new Model();
-    miniCubeModel->addMesh(miniCubeMesh);
-    miniCubeModel->addMat(materials["wood"], 0);
-
-    GameObject* cubeObject = new GameObject();
-    cubeObject->setInstanceCount(maxi.size());
-    cubeObject->setModel(cubeModel);
-    
-    GameObject* miniCubeObject = new GameObject();
-    miniCubeObject->setInstanceCount(mini.size());
-    miniCubeObject->setModel(miniCubeModel);
-
-    objects.push_back(cubeObject);
-    objects.push_back(miniCubeObject);
 }
 
 void App::sceneSetup()
@@ -271,11 +224,7 @@ void App::sceneSetup()
     fprintf(stderr, "[INFO] Surface created!\n");
 
     fprintf(stderr, "[INFO] Positioning objects...\n");
-    generatePlaces();
-
-    fprintf(stderr, "[INFO] Cubes creating...\n");
-    generateCubes();
-    fprintf(stderr, "[INFO] Cubes spawned!\n");
+    generateTrees();
 
     fprintf(stderr, "[INFO] Objects loaded!\n");
 
@@ -288,7 +237,8 @@ void App::sceneSetup()
     lights[2] = new PointLight(glm::vec3(30.0f, scatterer->getHeight(30.0f, 30.0f)+2.0f, 30.0f));
     lights[3] = new PointLight(glm::vec3(48.0f, scatterer->getHeight(40.0f, 40.0f)+2.0f, 40.0f));
 
-    for(int i=0; i<4; i++){
+    for(int i=0; i<4; i++)
+    {
         lights[i]->setLightColor(glm::vec3(0.05f), glm::vec3(0.3f), glm::vec3(0.9f));
         lights[i]->setLightIntensity(1.0f, 0.7, 0.17f);
         //7 distance 0.7 1.8
@@ -308,7 +258,8 @@ void App::sceneSetup()
     matrixUbo->setVPmatrix(camera->getView(), projection);
     pointsUbo = new UniformBufferObject(1);
     pointsUbo->preservePointLight(4);
-    for(int i=0; i<4; i++){
+    for(int i=0; i<4; i++)
+    {
         pointsUbo->setPointLights(lights[i], i);
     }
     directionUbo = new UniformBufferObject(2);
@@ -321,11 +272,20 @@ void App::sceneSetup()
     fprintf(stderr, "[INFO] Lights functioning!\n");
 
     fprintf(stderr, "[INFO] Be prepared. Only some last magic left!\n");
+
     modelMatrixes = new ShaderStorageBuffer(4);
-    modelMatrixes->preserveModelMat(maxi.size() + mini.size());
-    for(int i = 0; i < maxi.size() + mini.size(); i++){
+    skinningMatrixes = new ShaderStorageBuffer(5);
+    modelMatrixes->preserveMat(places.size(), 2);
+    skinningMatrixes->preserveMat(skinning.size(), 1);
+
+    for(unsigned int i = 0; i < places.size(); i++)
+    {
         glm::mat4 normalMatrix = glm::transpose(glm::inverse(places[i]));
         modelMatrixes->setModelMat(places[i], normalMatrix, i);
+    }
+    for(unsigned int i = 0; i < skinning.size(); i++)
+    {
+        skinningMatrixes->setSkinningMat(skinning[i], i);
     }
 
     fprintf(stderr, "[INFO] Okay, okay, should be ready.\n");
@@ -335,10 +295,6 @@ void App::sceneSetup()
 void App::bindUniforms()
 {
     matrixUbo->setVPmatrix(camera->getView(), projection);
-    for(int i = 0; i < 10; i++){
-        glm::mat4 normalMatrix = glm::transpose(glm::inverse(places[i]));
-        modelMatrixes->setModelMat(places[i], normalMatrix, i);
-    }
 }
 
 void App::initShaders()
@@ -352,7 +308,8 @@ void App::initShaders()
     shaderPrograms.insert(std::pair<std::string, Shader*>("skinning", skinningShader));
 }
 
-void App::processInput() {
+void App::processInput() 
+{
     camera->rotate(pitch, yaw);
 
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -372,7 +329,8 @@ void App::processInput() {
         camera->setSpeed(2.0f);
 }
 
-void App::calculateDeltaTime() {
+void App::calculateDeltaTime() 
+{
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
@@ -391,7 +349,8 @@ void App::loop()
 
         this->bindUniforms();
 
-        for(auto* object : objects){
+        for(auto* object : objects)
+        {
             object->draw(camera);
         }
 
@@ -400,7 +359,8 @@ void App::loop()
     }
 }
 
-void App::getMouseCoords(){
+void App::getMouseCoords()
+{
     GLdouble xPos, yPos;
     glfwGetCursorPos(window, &xPos, &yPos);
     float sensitivity = 0.05f;

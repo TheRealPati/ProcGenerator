@@ -16,9 +16,8 @@ std::vector<ColonBranch*> SpaceColonization::colonize(glm::vec3 rootPos, glm::ve
     generatedBranches.emplace_back(root);
 
     bodyGrow(root, generatedBranches);
-    fprintf(stderr, "Levél fel \n");
     for(int i = 0; i < 80; i++){
-        leafGrow(root, generatedBranches);
+        leafGrow(generatedBranches);
     }
     
     return generatedBranches;
@@ -43,19 +42,20 @@ void SpaceColonization::bodyGrow(ColonBranch* root, std::vector<ColonBranch*>& g
         if(!firstLeafFound)
         {
             glm::vec3 newDir = glm::normalize(current->direction + glm::vec3(0.0f, 1.0f, 0.0f));
-            glm::vec3 newPos = current->pos + newDir * 0.4f;
+            glm::vec3 newPos = current->pos + newDir * 0.35f;
             ColonBranch* branch = new ColonBranch({newPos, newDir, newDir, current});
+            current->childrenCount++;
             generatedBranches.emplace_back(branch);
             current = branch;
         }
     }
 }
 
-void SpaceColonization::leafGrow(ColonBranch* root, std::vector<ColonBranch*>& generatedBranches)
+void SpaceColonization::leafGrow(std::vector<ColonBranch*>& generatedBranches)
 {
     std::vector<int> killable;
     //First leaf found, scattering phase
-    for(int i = 0; i < points.size(); i++)
+    for(unsigned int i = 0; i < points.size(); i++)
     {
         ColonBranch* closest = NULL;
         glm::vec3 pointPos(points[i].x, points[i].y, points[i].z);
@@ -95,10 +95,11 @@ void SpaceColonization::leafGrow(ColonBranch* root, std::vector<ColonBranch*>& g
     {
         if (branch->leafCount > 0) {
             glm::vec3 newDir = glm::normalize(branch->direction + glm::vec3(0.0f, 1.0f, 0.0f));
-            glm::vec3 newPos = branch->pos + branch->direction * 0.4f;
+            glm::vec3 newPos = branch->pos + branch->direction * 0.35f;
             ColonBranch* newBranch = new ColonBranch({newPos, newDir, newDir, branch});
+            branch->childrenCount++;
             addable.emplace_back(newBranch);
-            //branch->direction = branch->original_direction;
+            branch->direction = branch->original_direction;
             branch->leafCount = 0;
         }
     }

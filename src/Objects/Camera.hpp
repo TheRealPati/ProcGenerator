@@ -10,7 +10,8 @@
 // Standard Headers
 #include <vector>
 
-enum class KeyboardDirection { 
+enum class KeyboardDirection 
+{ 
     FORWARD, 
     BACKWARD,
     LEFT,

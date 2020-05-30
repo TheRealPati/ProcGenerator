@@ -22,6 +22,7 @@
 
 #include "Mesh.hpp"
 #include "SolidMesh.hpp"
+#include "RiggedMesh.hpp"
 #include "Material.hpp"
 
 class Model
@@ -37,11 +38,6 @@ private:
 public:
     Model();
     void addMesh(Mesh* mesh);
-    void loadModel(std::string path);
-    void processNode(aiNode *node, const aiScene *scene);
-
-    Mesh* createMesh(aiMesh *mesh);
-
     void addMat(Material* mat, GLuint index);
 
     void draw(glm::mat4& model, glm::mat4& normal, glm::vec3& cameraPos, int count);

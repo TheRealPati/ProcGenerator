@@ -22,7 +22,7 @@ class GameObject
 {
 private:
     Model* model;
-    int instanceCount;
+    int instanceCount = 1;
 
     glm::mat4 modelMatrix = glm::mat4(1.0f);
     glm::mat4 normalMatrix = glm::mat4(1.0f);

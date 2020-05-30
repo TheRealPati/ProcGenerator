@@ -1,10 +1,11 @@
 #include "RiggedMesh.hpp"
 
-RiggedMesh::RiggedMesh(std::vector<VertexPNT> vertexData, std::vector<GLuint> indices, std::vector<InstanceInfo> vertexSkinning)
+RiggedMesh::RiggedMesh(std::vector<VertexPNT> vertexData, std::vector<GLuint> indices, std::vector<glm::vec4> skinning, std::vector<InstanceInfo> instanceData)
 {
     this->vertexData = vertexData;
     this->indices = indices;
-    this->vertexSkinning = vertexSkinning;
+    this->instanceData = instanceData;
+    this->skinning = skinning;
 
     setup();
 }
@@ -14,6 +15,7 @@ void RiggedMesh::setup()
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &instanceVBO);
+    glGenBuffers(1, &skinningVBO);
     glGenBuffers(1, &EBO);
     glBindVertexArray(VAO);
 
@@ -27,16 +29,20 @@ void RiggedMesh::setup()
     glEnableVertexAttribArray(2);  
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPNT), (void*)offsetof(VertexPNT, texCoords));
 
+    //Skinning buffer
+    glBindBuffer(GL_ARRAY_BUFFER, skinningVBO); 
+    glBufferData(GL_ARRAY_BUFFER, skinning.size() * sizeof(glm::vec4), &skinning[0], GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), 0);
+
     //Instance buffer
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); 
-    glBufferData(GL_ARRAY_BUFFER, vertexSkinning.size() * sizeof(InstanceInfo), &vertexSkinning[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, instanceData.size() * sizeof(InstanceInfo), &instanceData[0], GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(3); 
     glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceInfo), (void*)offsetof(InstanceInfo, boneIndices));
     glVertexAttribDivisor(3, 1);
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceInfo), (void*)offsetof(InstanceInfo, weights));
-    glVertexAttribDivisor(4, 1);
     glEnableVertexAttribArray(5);
     glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(InstanceInfo), (void*)offsetof(InstanceInfo, modelMatIndex));
     glVertexAttribDivisor(5, 1);
