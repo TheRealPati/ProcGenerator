@@ -5,16 +5,15 @@ Material::Material(Shader* shader)
     this->shader = shader;
 }
 
+Material::~Material()
+{
+    delete generatedData;
+}
+
 void Material::loadTexture(std::string filePath)
 {
     this->filePath = filePath;
-    glGenTextures(1, &diffuse);
-    glBindTexture(GL_TEXTURE_2D, diffuse); 
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    this->initBuffer();
 
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true); 
@@ -29,6 +28,38 @@ void Material::loadTexture(std::string filePath)
         fprintf(stderr, "[ERROR] Texture loading failed : %s!\n", filePath.c_str() );
     }
     stbi_image_free(data);
+}
+
+void Material::initBuffer()
+{
+    glGenTextures(1, &diffuse);
+    glBindTexture(GL_TEXTURE_2D, diffuse); 
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+void Material::generateTexture(int width, int height)
+{
+    this->initBuffer();
+
+    NoiseGen noiseGen = NoiseGen();
+    generatedData = new std::vector<float>();
+    for(int i = 0; i < width; i++)
+    {
+        for(int j = 0; j < height; j++)
+        {
+            float intensity = noiseGen.woodValue(glm::vec2((double)i, (double)j));
+            generatedData->emplace_back(intensity);
+            generatedData->emplace_back(intensity);
+            generatedData->emplace_back(intensity);
+        }
+    }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, &(*generatedData)[0]);
+    glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 void Material::setMaterialProps(glm::vec3 specular, float shininess)

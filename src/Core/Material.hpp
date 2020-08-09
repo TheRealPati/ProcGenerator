@@ -17,6 +17,7 @@
 #include "Include/stb_image.hpp"
 #include "Include/filesystem.hpp"
 #include "Shader.hpp"
+#include "Algorithm/NoiseGen.hpp"
 
 class Material
 {
@@ -29,9 +30,14 @@ private:
     glm::vec3 specular;    
     float shininess;
 
+    std::vector<float>* generatedData;
+
+    void initBuffer();
+
 public:
     Material(Shader* shader);
     void loadTexture(std::string filePath);
+    void generateTexture(int width, int height);
     std::string getName();
     void setMaterialProps(glm::vec3 specular, float shininess);
     void setModelMatrix(glm::mat4& model, glm::mat4& normal);

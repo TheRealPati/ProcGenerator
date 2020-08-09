@@ -26,7 +26,7 @@ std::vector<VertexPNT> TerrainGenAlgo::generateVertices()
         for(unsigned int j = 0; j < surfaceSideSize; j++){
             VertexPNT pc;
             pc.position = {(float)i/density - surfaceSideSize/density/2, 0.0f, (float)j/density - surfaceSideSize/density/2};
-            pc.texCoords = {1.0f/surfaceSideSize*i, 1.0f/surfaceSideSize*j};
+            pc.texCoords = {i/(float)surfaceSideSize, j/(float)surfaceSideSize};
             vertexData.push_back(pc);
         }
     }

@@ -115,8 +115,10 @@ void App::createMaterials()
 {
     //Creating mats
     Material* surfaceMat = new Material(shaderPrograms.at("basic"));
-    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"));
-    surfaceMat->setMaterialProps(glm::vec3(0.2f), 32);
+    //surfaceMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"));
+    surfaceMat->generateTexture(256, 256);
+    //surfaceMat->setMaterialProps(glm::vec3(0.2f), 32);
+    surfaceMat->setMaterialProps(glm::vec3(0.02f), 32);
     materials.insert(std::pair<std::string, Material*>("surface", surfaceMat));
 
     Material* rainbowMat = new Material(shaderPrograms.at("skinning"));
@@ -131,6 +133,7 @@ void App::createMaterials()
 
     Material* woodMat = new Material(shaderPrograms.at("skinning"));
     woodMat->loadTexture(FileSystem::getPath("resources/textures/wood.jpg"));
+    //woodMat->generateTexture(256, 256);
     woodMat->setMaterialProps(glm::vec3(0.004f), 256);
     materials.insert(std::pair<std::string, Material*>("wood", woodMat));
 }
@@ -186,7 +189,7 @@ void App::generateTrees()
     threeWayModel->addMat(materials["wood"], 0);
 
     GameObject* threeWayObject = new GameObject();
-    threeWayObject->setInstanceCount(forest->getThreeWayInstances().size());
+    threeWayObject->setInstanceCount(forest->getInstanceInfo("threeWay").size());
     threeWayObject->setModel(threeWayModel);
 
     objects.push_back(threeWayObject);
@@ -199,10 +202,23 @@ void App::generateTrees()
 
     GameObject* twoWayObject = new GameObject();
 
-    twoWayObject->setInstanceCount(forest->getTwoWayInstances().size());
+    twoWayObject->setInstanceCount(forest->getInstanceInfo("twoWay").size());
     twoWayObject->setModel(twoWayModel);
 
     objects.push_back(twoWayObject);
+
+    Mesh* fourWayMesh = forest->getFourWayMesh();
+
+    Model* fourWayModel = new Model();
+    fourWayModel->addMesh(fourWayMesh);
+    fourWayModel->addMat(materials["wood"], 0);
+
+    GameObject* fourWayObject = new GameObject();
+
+    fourWayObject->setInstanceCount(forest->getInstanceInfo("fourWay").size());
+    fourWayObject->setModel(fourWayModel);
+
+    objects.push_back(fourWayObject);
 }
 
 void App::generateEntities()
@@ -230,7 +246,7 @@ void App::sceneSetup()
 
     fprintf(stderr, "[INFO] Making some light!\n");
     dirLight = new DirectionalLight(glm::vec3(10.0f, -10.0f, 0.0f));
-    dirLight->setLightColor(glm::vec3(0.05f), glm::vec3(0.03f), glm::vec3(0.08f));
+    dirLight->setLightColor(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f));
 
     lights[0] = new PointLight(glm::vec3(10.0f, scatterer->getHeight(10.0f, 10.0f)+2.0f, 10.0f));
     lights[1] = new PointLight(glm::vec3(20.0f, scatterer->getHeight(20.0f, 20.0f)+2.0f, 20.0f));
@@ -239,8 +255,9 @@ void App::sceneSetup()
 
     for(int i=0; i<4; i++)
     {
-        lights[i]->setLightColor(glm::vec3(0.05f), glm::vec3(0.3f), glm::vec3(0.9f));
-        lights[i]->setLightIntensity(1.0f, 0.7, 0.17f);
+        lights[i]->setLightColor(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(0.0f));
+        lights[i]->setLightIntensity(1.0f, 0.7, 1.8f);
+        //Mostani 0.7 0.17
         //7 distance 0.7 1.8
         //13 distance 0.35 0.44
         //32 distance 0.14 0.07
@@ -248,7 +265,7 @@ void App::sceneSetup()
     }
 
     spotLight = new SpotLight(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, 10.0f, 0.0f));
-    spotLight->setLightColor(glm::vec3(0.0f), glm::vec3(1.0f), glm::vec3(1.0f));
+    spotLight->setLightColor(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(0.0f));
     spotLight->setLightIntensity(1.0f, 0.9f, 0.032f);
     spotLight->setSpotArea(glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(32.5f)));
 

@@ -29,14 +29,12 @@ private:
     unsigned int treeCount;
 
     //LEGO pieces
-    Importer importerThreeWay;
-    Importer importerTwoWay;
-
-    std::vector<InstanceInfo> threeWay;
-    std::vector<InstanceInfo> twoWay;
+    Importer importer;
+    std::map<std::string, std::vector<InstanceInfo>> pieceInstanceInfo;
 
     Mesh* twoWayMesh;
     Mesh* threeWayMesh;
+    Mesh* fourWayMesh;
 
 public:
     Forest(Randomizer& randomizer, ObjectScatterer* scatterer, unsigned int treeCount);
@@ -48,10 +46,10 @@ public:
     glm::vec3 getCurrentAxis(ColonBranch* branch);
     glm::mat4 calcRotMat(const glm::vec3& originalAxis, const glm::vec3& modifiedAxis);
 
-    std::vector<InstanceInfo> getThreeWayInstances();
-    std::vector<InstanceInfo> getTwoWayInstances();
+    std::vector<InstanceInfo> getInstanceInfo(std::string key);
     Mesh* getThreeWayMesh();
     Mesh* getTwoWayMesh();
+    Mesh* getFourWayMesh();
 
     ~Forest();
 };

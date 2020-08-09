@@ -7,6 +7,13 @@ Importer::Importer()
 
 void Importer::loadModel(std::string path, ModelType type)
 {
+
+    vertexData.clear();
+    indices.clear();
+	boneMapping.clear();
+    vertexBoneData.clear();
+    offsetMatrixes.clear();
+
     this->type = type;
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(FileSystem::getPath(path), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);

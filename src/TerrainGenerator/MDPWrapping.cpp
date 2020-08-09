@@ -134,6 +134,8 @@ void MDPWrapping::modifyTerrain(std::vector<VertexPNT>& vertices)
             pc.position.x = (float)(i%surfaceSideSize)/density;
             pc.position.z = (float)j/density;
             pc.position.y = 0;
+            pc.texCoords.x = (float)(i%surfaceSideSize)/surfaceSideSize;
+            pc.texCoords.y = (float)j/surfaceSideSize;
             row.emplace_back(pc);
             if(i%surfaceSideSize == surfaceSideSize-1)
             {

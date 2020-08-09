@@ -8,9 +8,6 @@ Forest::Forest(Randomizer& randomizer, ObjectScatterer* scatterer, unsigned int 
 
 void Forest::populate(unsigned int maxSideSize, std::vector<glm::mat4>& places, std::vector<glm::mat4>& skinning)
 {
-    importerTwoWay.loadModel("resources/models/twoway.dae", ModelType::RIGGED);
-    importerThreeWay.loadModel("resources/models/threeway.dae", ModelType::RIGGED);
-
     RegionSeeder seeder = RegionSeeder(randomizer, 200);
 
     for(unsigned int i = 0; i < treeCount; i++){
@@ -37,9 +34,15 @@ void Forest::populate(unsigned int maxSideSize, std::vector<glm::mat4>& places, 
         }
     }
 
-    threeWayMesh = new RiggedMesh(importerThreeWay.getVertexData(), importerThreeWay.getIndices(), importerThreeWay.getWeights(), threeWay);
+    importer.loadModel("resources/models/2way_rig.dae", ModelType::RIGGED);
+    twoWayMesh = new RiggedMesh(importer.getVertexData(), importer.getIndices(), importer.getWeights(), pieceInstanceInfo["twoWay"]);
 
-    twoWayMesh = new RiggedMesh(importerTwoWay.getVertexData(), importerTwoWay.getIndices(), importerTwoWay.getWeights(), twoWay);
+    importer.loadModel("resources/models/3way_rig.dae", ModelType::RIGGED);
+    threeWayMesh = new RiggedMesh(importer.getVertexData(), importer.getIndices(), importer.getWeights(), pieceInstanceInfo["threeWay"]);
+
+    importer.loadModel("resources/models/4way_rig.dae", ModelType::RIGGED);
+    fourWayMesh = new RiggedMesh(importer.getVertexData(), importer.getIndices(), importer.getWeights(), pieceInstanceInfo["fourWay"]);
+
 }
 
 void Forest::mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, std::vector<glm::mat4>& skinning)
@@ -50,14 +53,23 @@ void Forest::mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, s
     glm::vec3 originalAxis = getCurrentAxis(branch);
     glm::mat4 rotMat;
 
-    //Three way
-    if(branch->childrenCount == 2)
+    //Four way
+    if(branch->childrenCount == 3)
     {
         rotMat = calcRotMat(originalAxis, glm::normalize(branch->parent->pos - branch->pos));
         info.boneIndices.x = skinning.size();
         
-        branch->instanceID = threeWay.size();
-        threeWay.emplace_back(info);
+        branch->instanceID = pieceInstanceInfo["fourWay"].size();
+        pieceInstanceInfo["fourWay"].emplace_back(info);
+    }
+    //Three way
+    else if(branch->childrenCount == 2)
+    {
+        rotMat = calcRotMat(originalAxis, glm::normalize(branch->parent->pos - branch->pos));
+        info.boneIndices.x = skinning.size();
+        
+        branch->instanceID = pieceInstanceInfo["threeWay"].size();
+        pieceInstanceInfo["threeWay"].emplace_back(info);
     }
     //Two way
     else if(branch->childrenCount == 1 || branch->childrenCount == 0)
@@ -80,8 +92,8 @@ void Forest::mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, s
 
         info.boneIndices.x = skinning.size();
         
-        branch->instanceID = twoWay.size();
-        twoWay.emplace_back(info);
+        branch->instanceID = pieceInstanceInfo["twoWay"].size();
+        pieceInstanceInfo["twoWay"].emplace_back(info);
     }
     else
         fprintf(stderr, "TODO megcsinálni %d -ra \n", branch->childrenCount);
@@ -95,11 +107,22 @@ void Forest::mutateBranchParent(ColonBranch* branch, ColonBranch* child, std::ve
     glm::vec3 originalAxis = getCurrentAxis(branch);
     glm::mat4 rotMat;
 
+    //Four way
+    if(branch->childrenCount == 3)
+    {
+        InstanceInfo& info = pieceInstanceInfo["fourWay"][branch->instanceID];
+
+        if(branch->leafCount == 1)
+            info.boneIndices.y = skinning.size();
+        if(branch->leafCount == 2)
+            info.boneIndices.z = skinning.size();
+        if(branch->leafCount == 3)
+            info.boneIndices.w = skinning.size();
+    }
     //Three way
     if(branch->childrenCount == 2)
     {
-        rotMat = calcRotMat(originalAxis, glm::normalize(child->pos - branch->pos));
-        InstanceInfo& info = threeWay[branch->instanceID];
+        InstanceInfo& info = pieceInstanceInfo["threeWay"][branch->instanceID];
 
         if(branch->leafCount == 1)
             info.boneIndices.y = skinning.size();
@@ -109,13 +132,13 @@ void Forest::mutateBranchParent(ColonBranch* branch, ColonBranch* child, std::ve
     //Two way
     else if(branch->childrenCount == 1 || branch->childrenCount == 0)
     {
-        rotMat = calcRotMat(originalAxis, glm::normalize(child->pos - branch->pos));
-        InstanceInfo& info = twoWay[branch->instanceID];
+        InstanceInfo& info = pieceInstanceInfo["twoWay"][branch->instanceID];
 
         if(branch->leafCount == 1)
             info.boneIndices.y = skinning.size();
     }
 
+    rotMat = calcRotMat(originalAxis, glm::normalize(child->pos - branch->pos));
     skinning.emplace_back(rotMat);
     branch->leafCount++;
 }
@@ -138,33 +161,39 @@ glm::vec3 Forest::getCurrentAxis(ColonBranch* branch)
     if(branch->childrenCount == 0 || branch->childrenCount == 1)
     {
         if(branch->leafCount == 0)
-            axis = glm::vec3(1.0f, 0.0f, 0.0f);
+            axis = glm::vec3(0.0f, 0.0f, 1.0f);
         else if(branch->leafCount == 1)
-            axis = glm::vec3(-1.0f, 0.0f, 0.0f);
+            axis = glm::vec3(0.0f, 0.0f, -1.0f);
     }
     //Threeway
     else if(branch->childrenCount == 2)
     {
-        //TODO Kideríteni hogy a fenébe áll
         if(branch->leafCount == 0)
             axis = glm::vec3(0.0f, 0.0f, 1.0f);
         else if(branch->leafCount == 1)
-            axis = glm::normalize(glm::vec3(0.0f, 1.0f, -1.0f));
+            axis = glm::normalize(glm::vec3(1.0f, 0.0f, -1.0f));
         else if(branch->leafCount == 2)
-            axis = glm::normalize(glm::vec3(0.0f, -1.0f, -1.0f));
+            axis = glm::normalize(glm::vec3(-1.0f, 0.0f, -1.0f));
+    }
+    //Fourway
+    else if(branch->childrenCount == 3)
+    {
+        if(branch->leafCount == 0)
+            axis = glm::vec3(0.0f, 0.0f, 1.0f);
+        else if(branch->leafCount == 1)
+            axis = glm::vec3(1.0f, 0.0f, 0.0f);
+        else if(branch->leafCount == 2)
+            axis = glm::vec3(0.0f, 0.0f, -1.0f);
+        else if(branch->leafCount == 3)
+            axis = glm::vec3(-1.0f, 0.0f, 0.0f);
     }
 
     return axis;
 }
 
-std::vector<InstanceInfo> Forest::getThreeWayInstances()
+std::vector<InstanceInfo> Forest::getInstanceInfo(std::string key)
 {
-    return threeWay;
-}
-
-std::vector<InstanceInfo> Forest::getTwoWayInstances()
-{
-    return twoWay;
+    return pieceInstanceInfo.at(key);
 }
 
 Mesh* Forest::getThreeWayMesh()
@@ -175,4 +204,9 @@ Mesh* Forest::getThreeWayMesh()
 Mesh* Forest::getTwoWayMesh()
 {
     return twoWayMesh;
+}
+
+Mesh* Forest::getFourWayMesh()
+{
+    return fourWayMesh;
 }
