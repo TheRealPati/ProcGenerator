@@ -27,12 +27,12 @@ void QuadTree::divide()
     botRightTree->insert(this->node); 
 }
 
-void QuadTree::insert(Point *node) 
+void QuadTree::insert(PN *node) 
 { 
     if (node == NULL)
         return;
 
-    if (!inBoundary(node->x, node->z)) 
+    if (!inBoundary(node->position.x, node->position.z)) 
         return;
 
     if(!hasNode)
@@ -51,28 +51,7 @@ void QuadTree::insert(Point *node)
     }
 } 
 
-/* void QuadTree::queryRange( std::vector<Point*> found)
-{
-    //Ha intersect és topLeft nem null
-    {
-        //Query
-    }
-    else if(intersect)
-    {
-
-    }
-}
-
-bool QuadTree::tryPlace(float x, float z, float radius)
-{
-    if(intersect(x, z, radius))
-    {
-
-    }
-    return false;
-} */
-
-Point* QuadTree::search(float x, float z) 
+PN* QuadTree::search(float x, float z) 
 { 
     if(hasNode && !divided)
     {

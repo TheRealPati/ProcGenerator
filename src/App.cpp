@@ -115,11 +115,14 @@ void App::createMaterials()
 {
     //Creating mats
     Material* surfaceMat = new Material(shaderPrograms.at("basic"));
-    //surfaceMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"));
-    surfaceMat->generateTexture(256, 256);
-    //surfaceMat->setMaterialProps(glm::vec3(0.2f), 32);
-    surfaceMat->setMaterialProps(glm::vec3(0.02f), 32);
+    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"));
+    surfaceMat->setMaterialProps(glm::vec3(0.2f), 32);
     materials.insert(std::pair<std::string, Material*>("surface", surfaceMat));
+
+    Material* perlinMat = new Material(shaderPrograms.at("basic"));
+    perlinMat->generateTexture(256, 256);
+    perlinMat->setMaterialProps(glm::vec3(0.02f), 32);
+    materials.insert(std::pair<std::string, Material*>("perlin", perlinMat));
 
     Material* rainbowMat = new Material(shaderPrograms.at("skinning"));
     rainbowMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"));
@@ -136,6 +139,11 @@ void App::createMaterials()
     //woodMat->generateTexture(256, 256);
     woodMat->setMaterialProps(glm::vec3(0.004f), 256);
     materials.insert(std::pair<std::string, Material*>("wood", woodMat));
+
+    Material* weedMat = new Material(shaderPrograms.at("alphaTest"));
+    weedMat->loadTexture(FileSystem::getPath("resources/textures/weed.png"));
+    weedMat->setMaterialProps(glm::vec3(0.02f), 16);
+    materials.insert(std::pair<std::string, Material*>("weed", weedMat));
 }
 
 void App::generateTerrain()
@@ -221,9 +229,25 @@ void App::generateTrees()
     objects.push_back(fourWayObject);
 }
 
-void App::generateEntities()
+void App::generateGroundFoliage()
 {
+    Grassfield* grass = new Grassfield(randomizer, scatterer);
+    grass->populate(maxSideSize, groundBillboard, 8000);
 
+    CrossedPlane plane = CrossedPlane(1.0f);
+
+    Mesh* grassMesh = new InstancedMesh(plane.getVertexData(), plane.getIndexData());
+
+    Model* grassModel = new Model();
+    grassModel->addMesh(grassMesh);
+    grassModel->addMat(materials["weed"], 0);
+
+    GameObject* grassObject = new GameObject();
+
+    grassObject->setInstanceCount(groundBillboard.size());
+    grassObject->setModel(grassModel);
+
+    objects.push_back(grassObject);
 }
 
 void App::sceneSetup()
@@ -241,6 +265,7 @@ void App::sceneSetup()
 
     fprintf(stderr, "[INFO] Positioning objects...\n");
     generateTrees();
+    generateGroundFoliage();
 
     fprintf(stderr, "[INFO] Objects loaded!\n");
 
@@ -290,10 +315,13 @@ void App::sceneSetup()
 
     fprintf(stderr, "[INFO] Be prepared. Only some last magic left!\n");
 
+    //SSBO
     modelMatrixes = new ShaderStorageBuffer(4);
     skinningMatrixes = new ShaderStorageBuffer(5);
+    groundBillboardMatrixes = new ShaderStorageBuffer(6);
     modelMatrixes->preserveMat(places.size(), 2);
     skinningMatrixes->preserveMat(skinning.size(), 1);
+    groundBillboardMatrixes->preserveMat(groundBillboard.size(), 1);
 
     for(unsigned int i = 0; i < places.size(); i++)
     {
@@ -303,6 +331,10 @@ void App::sceneSetup()
     for(unsigned int i = 0; i < skinning.size(); i++)
     {
         skinningMatrixes->setSkinningMat(skinning[i], i);
+    }
+    for(unsigned int i = 0; i < groundBillboard.size(); i++)
+    {
+        groundBillboardMatrixes->setSkinningMat(groundBillboard[i], i);
     }
 
     fprintf(stderr, "[INFO] Okay, okay, should be ready.\n");
@@ -320,9 +352,15 @@ void App::initShaders()
     std::string basicFS = FileSystem::getPath("resources/shaders/basicFs.glsl");
     Shader* basicShader = new Shader(basicVS, basicFS);
     shaderPrograms.insert(std::pair<std::string, Shader*>("basic", basicShader));
+
     std::string skinningVS = FileSystem::getPath("resources/shaders/skinningVs.glsl");
     Shader* skinningShader = new Shader(skinningVS, basicFS);
     shaderPrograms.insert(std::pair<std::string, Shader*>("skinning", skinningShader));
+
+    std::string alphaVS = FileSystem::getPath("resources/shaders/alphaVs.glsl");
+    std::string alphaFS = FileSystem::getPath("resources/shaders/alphaFs.glsl");
+    Shader* alphaShader = new Shader(alphaVS, alphaFS);
+    shaderPrograms.insert(std::pair<std::string, Shader*>("alphaTest", alphaShader));
 }
 
 void App::processInput() 

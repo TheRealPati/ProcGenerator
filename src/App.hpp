@@ -30,18 +30,23 @@
 #include "Objects/Camera.hpp"
 #include "Objects/PointLight.hpp"
 #include "Objects/Forest.hpp"
+#include "Objects/Grassfield.hpp"
+
 #include "Core/Shader.hpp"
 #include "Core/Material.hpp"
 #include "Core/Mesh.hpp"
 #include "Core/SolidMesh.hpp"
 #include "Core/RiggedMesh.hpp"
+#include "Core/InstancedMesh.hpp"
 #include "Core/Model.hpp"
 #include "Core/GameObject.hpp"
+
 #include "Core/UniformObjectBuffer.hpp"
 #include "Core/ShaderStorageBuffer.hpp"
 
 #include "Primitives/Cube.hpp"
 #include "Primitives/Cylinder.hpp"
+#include "Primitives/CrossedPlane.hpp"
 
 #include "Include/filesystem.hpp"
 
@@ -79,6 +84,7 @@ private:
     ObjectScatterer* scatterer;
     std::vector<glm::mat4> places;
     std::vector<glm::mat4> skinning = { glm::mat4(1.0f) };
+    std::vector<glm::mat4> groundBillboard;
     glm::mat4 projection;
 
     GLFWwindow* window;
@@ -97,6 +103,7 @@ private:
     UniformBufferObject* spotUbo;
     ShaderStorageBuffer* modelMatrixes;
     ShaderStorageBuffer* skinningMatrixes;
+    ShaderStorageBuffer* groundBillboardMatrixes;
 
 public:
     App(Randomizer& randomizer);
@@ -108,7 +115,7 @@ public:
     void createMaterials();
     void generateTerrain();
     void generateTrees();
-    void generateEntities();
+    void generateGroundFoliage();
 
     void bindUniforms();
     void processInput();

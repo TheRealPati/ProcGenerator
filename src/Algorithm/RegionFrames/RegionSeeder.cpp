@@ -6,9 +6,9 @@ RegionSeeder::RegionSeeder(Randomizer& randomizer, int numberOfPoints)
     this->numberOfPoints = numberOfPoints;
 }
 
-std::vector<Point> RegionSeeder::seed(Point bottomCenter, float width, float height, FrameRegion type)
+std::vector<PN> RegionSeeder::seed(PN bottomCenter, float width, float height, FrameRegion type)
 {
-    std::vector<Point> generatedPoints = {};
+    std::vector<PN> generatedPoints = {};
     int accepted = 0;
 
     Frame* frame;
@@ -21,15 +21,15 @@ std::vector<Point> RegionSeeder::seed(Point bottomCenter, float width, float hei
 
     while(accepted < numberOfPoints || accepted == 10000)
     {
-        Point p;
-        p.x = randomizer.randCenterEqually() * width;
-        p.y = randomizer.rand() * height;
-        p.z = randomizer.randCenterEqually() * width;
+        PN p;
+        p.position.x = randomizer.randCenterEqually() * width;
+        p.position.y = randomizer.rand() * height;
+        p.position.z = randomizer.randCenterEqually() * width;
         if(frame->inBound(p))
         {
-            p.x += bottomCenter.x;
-            p.y += bottomCenter.y;
-            p.z += bottomCenter.z;
+            p.position.x += bottomCenter.position.x;
+            p.position.y += bottomCenter.position.y;
+            p.position.z += bottomCenter.position.z;
             generatedPoints.emplace_back(p);
             accepted++;
         }

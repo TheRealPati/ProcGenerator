@@ -16,10 +16,12 @@ void Forest::populate(unsigned int maxSideSize, std::vector<glm::mat4>& places, 
         float y = scatterer->getHeight(x,z);
 
         //Control points for each tree
-        std::vector<Point> seedPoints = seeder.seed({x,y+5.0f,z}, 6.0f, 12.0f, FrameRegion::SPHERE);
+        PN point;
+        point.position = {x,y+5.0f,z};
+        std::vector<PN> seedPoints = seeder.seed(point, 6.0f, 12.0f, FrameRegion::SPHERE);
         
         SpaceColonization colonization = SpaceColonization(1.4f, 3.0f, seedPoints);
-        std::vector<ColonBranch*> branches = colonization.colonize({x,y,z}, {0.0f, 1.0f, 0.0f});
+        std::vector<ColonBranch*> branches = colonization.colonize({x,y,z}, scatterer->getNormal(x,z));
 
         for(ColonBranch* branch : branches)
         {
@@ -56,7 +58,7 @@ void Forest::mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, s
     //Four way
     if(branch->childrenCount == 3)
     {
-        rotMat = calcRotMat(originalAxis, glm::normalize(branch->parent->pos - branch->pos));
+        rotMat = scatterer->calcRotMat(originalAxis, glm::normalize(branch->parent->pos - branch->pos));
         info.boneIndices.x = skinning.size();
         
         branch->instanceID = pieceInstanceInfo["fourWay"].size();
@@ -65,7 +67,7 @@ void Forest::mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, s
     //Three way
     else if(branch->childrenCount == 2)
     {
-        rotMat = calcRotMat(originalAxis, glm::normalize(branch->parent->pos - branch->pos));
+        rotMat = scatterer->calcRotMat(originalAxis, glm::normalize(branch->parent->pos - branch->pos));
         info.boneIndices.x = skinning.size();
         
         branch->instanceID = pieceInstanceInfo["threeWay"].size();
@@ -77,17 +79,17 @@ void Forest::mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, s
         // Root branch
         if(branch->childrenCount == 1 && branch->parent == NULL)
         {
-            rotMat = calcRotMat(originalAxis, -branch->direction);
+            rotMat = scatterer->calcRotMat(originalAxis, -branch->direction);
         }
         // Intermediate branch bottom end
         else if(branch->childrenCount == 1)
         {
-            rotMat = calcRotMat(originalAxis, glm::normalize(branch->parent->pos - branch->pos));
+            rotMat = scatterer->calcRotMat(originalAxis, glm::normalize(branch->parent->pos - branch->pos));
         }
         // End branch bottom end
         else
         {
-            rotMat = calcRotMat(originalAxis, glm::normalize(branch->parent->pos - branch->pos));
+            rotMat = scatterer->calcRotMat(originalAxis, glm::normalize(branch->parent->pos - branch->pos));
         }
 
         info.boneIndices.x = skinning.size();
@@ -138,21 +140,12 @@ void Forest::mutateBranchParent(ColonBranch* branch, ColonBranch* child, std::ve
             info.boneIndices.y = skinning.size();
     }
 
-    rotMat = calcRotMat(originalAxis, glm::normalize(child->pos - branch->pos));
+    rotMat = scatterer->calcRotMat(originalAxis, glm::normalize(child->pos - branch->pos));
     skinning.emplace_back(rotMat);
     branch->leafCount++;
 }
 
-glm::mat4 Forest::calcRotMat(const glm::vec3& originalAxis, const glm::vec3& modifiedAxis)
-{
-    glm::vec3 axis = glm::cross(originalAxis, modifiedAxis);
-    float angle = acos(glm::dot(originalAxis, modifiedAxis));
-    glm::mat4 rotMat = glm::mat4(1.0f);
-    if(angle != 0)
-        rotMat = glm::rotate(glm::mat4(1.0f), angle, axis);
 
-    return rotMat;
-}
 
 glm::vec3 Forest::getCurrentAxis(ColonBranch* branch)
 {

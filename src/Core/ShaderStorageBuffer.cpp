@@ -14,6 +14,14 @@ void ShaderStorageBuffer::preserveMat(int countOfMatrix, int numOfMatrixEach)
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
+void ShaderStorageBuffer::preserveVec3(int countOfVectors)
+{
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, countOfVectors * sizeof(glm::vec3), NULL, GL_DYNAMIC_DRAW);
+    glBindBufferRange(GL_SHADER_STORAGE_BUFFER, bindingPoint, SSBO, 0, countOfVectors *  sizeof(glm::vec3));
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
 void ShaderStorageBuffer::setModelMat(glm::mat4& matrix, glm::mat4& normalMatrix, int index)
 {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
@@ -26,5 +34,12 @@ void ShaderStorageBuffer::setSkinningMat(glm::mat4& matrix, int index)
 {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, index * sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(matrix));
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
+void ShaderStorageBuffer::setVector3(glm::vec3& vec, int index)
+{
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, index * sizeof(glm::vec3), sizeof(glm::vec3), glm::value_ptr(vec));
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }

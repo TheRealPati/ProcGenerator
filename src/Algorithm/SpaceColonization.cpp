@@ -1,6 +1,6 @@
 #include "SpaceColonization.hpp"
 
-SpaceColonization::SpaceColonization(float minDistance, float maxDistance, std::vector<Point>& points) : points(points)
+SpaceColonization::SpaceColonization(float minDistance, float maxDistance, std::vector<PN>& points) : points(points)
 {
     this->minDistance = minDistance;
     this->maxDistance = maxDistance;
@@ -31,9 +31,9 @@ void SpaceColonization::bodyGrow(ColonBranch* root, std::vector<ColonBranch*>& g
     bool firstLeafFound = false;
     while(!firstLeafFound)
     {
-        for(Point point : points)
+        for(PN point : points)
         {
-            glm::vec3 pointPos(point.x, point.y, point.z);
+            glm::vec3 pointPos(point.position.x, point.position.y, point.position.z);
             float distance = glm::length(pointPos - current->pos);
             if(distance < maxDistance)
                 firstLeafFound = true;
@@ -58,7 +58,7 @@ void SpaceColonization::leafGrow(std::vector<ColonBranch*>& generatedBranches)
     for(unsigned int i = 0; i < points.size(); i++)
     {
         ColonBranch* closest = NULL;
-        glm::vec3 pointPos(points[i].x, points[i].y, points[i].z);
+        glm::vec3 pointPos(points[i].position.x, points[i].position.y, points[i].position.z);
         float closestDistance = maxDistance;
         for(ColonBranch* branch : generatedBranches)
         {

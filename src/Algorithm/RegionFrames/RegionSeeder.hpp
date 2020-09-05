@@ -31,7 +31,7 @@ protected:
     
 public:
     RegionSeeder(Randomizer& randomizer, int numberOfPoints);
-    std::vector<Point> seed(Point bottomCenter, float width, float height, FrameRegion type);
+    std::vector<PN> seed(PN bottomCenter, float width, float height, FrameRegion type);
     ~RegionSeeder();
 };
 

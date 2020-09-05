@@ -29,8 +29,10 @@ private:
 public:
     ShaderStorageBuffer(GLuint bindingPoint);
     void preserveMat(int countOfMatrix, int numOfMatrixEach);
+    void preserveVec3(int countOfVectors);
     void setModelMat(glm::mat4& matrix, glm::mat4& normalMatrix, int index);
     void setSkinningMat(glm::mat4& matrix, int index);
+    void setVector3(glm::vec3&, int index);
     
     ~ShaderStorageBuffer();
 };

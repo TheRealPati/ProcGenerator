@@ -34,11 +34,10 @@ struct VertexPNT
     glm::vec2 texCoords;
 };
 
-struct Point 
+struct PN 
 { 
-    float x;
-    float y;
-    float z;
+    glm::vec3 position;
+    glm::vec3 normal;
 }; 
 
 struct InstanceInfo

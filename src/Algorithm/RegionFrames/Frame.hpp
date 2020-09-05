@@ -15,6 +15,6 @@ protected:
     float height;
 public:
     Frame(float width, float height) : width(width), height(height){};
-    virtual bool inBound(Point point) = 0;
-    ~Frame(){};
+    virtual bool inBound(PN point) = 0;
+    virtual ~Frame(){};
 };

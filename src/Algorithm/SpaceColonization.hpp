@@ -24,9 +24,9 @@ class SpaceColonization
 private:
     float minDistance;
     float maxDistance;
-    std::vector<Point>& points;
+    std::vector<PN>& points;
 public:
-    SpaceColonization(float minDistance, float maxDistance, std::vector<Point>& points);
+    SpaceColonization(float minDistance, float maxDistance, std::vector<PN>& points);
     std::vector<ColonBranch*> colonize(glm::vec3 root, glm::vec3 rootNormal);
     void bodyGrow(ColonBranch* root, std::vector<ColonBranch*>& generatedBranches);
     void leafGrow(std::vector<ColonBranch*>& generatedBranches);
