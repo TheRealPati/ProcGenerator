@@ -29,5 +29,5 @@ protected:
 public:
     Mesh(){};
     virtual void draw(int count) = 0;
-    ~Mesh(){};
+    virtual ~Mesh(){};
 };

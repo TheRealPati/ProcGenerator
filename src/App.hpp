@@ -34,6 +34,9 @@
 
 #include "Core/Shader.hpp"
 #include "Core/Material.hpp"
+#include "Core/MaterialSingle.hpp"
+#include "Core/MaterialGroup.hpp"
+
 #include "Core/Mesh.hpp"
 #include "Core/SolidMesh.hpp"
 #include "Core/RiggedMesh.hpp"

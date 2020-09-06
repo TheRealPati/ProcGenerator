@@ -25,6 +25,8 @@
 #include "RiggedMesh.hpp"
 #include "Material.hpp"
 
+#include "Include/filesystem.hpp"
+
 enum class ModelType
 {
     PLAIN,

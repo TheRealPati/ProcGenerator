@@ -114,34 +114,31 @@ int App::initWindow()
 void App::createMaterials()
 {
     //Creating mats
-    Material* surfaceMat = new Material(shaderPrograms.at("basic"));
-    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"));
+    Material* surfaceMat = new MaterialGroup(shaderPrograms.at("ground"));
+    surfaceMat->generateTexture(256, 256);
+    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/grass.jpg"), GL_RGB);
+    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"), GL_RGB);
     surfaceMat->setMaterialProps(glm::vec3(0.2f), 32);
     materials.insert(std::pair<std::string, Material*>("surface", surfaceMat));
 
-    Material* perlinMat = new Material(shaderPrograms.at("basic"));
+    Material* perlinMat = new MaterialSingle(shaderPrograms.at("basic"));
     perlinMat->generateTexture(256, 256);
     perlinMat->setMaterialProps(glm::vec3(0.02f), 32);
     materials.insert(std::pair<std::string, Material*>("perlin", perlinMat));
 
-    Material* rainbowMat = new Material(shaderPrograms.at("skinning"));
-    rainbowMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"));
-    rainbowMat->setMaterialProps(glm::vec3(0.2f), 16);
-    materials.insert(std::pair<std::string, Material*>("rainbow", rainbowMat));
-
-    Material* dimwavesMat = new Material(shaderPrograms.at("skinning"));
-    dimwavesMat->loadTexture(FileSystem::getPath("resources/textures/dimensionwaves.jpg"));
+    Material* dimwavesMat = new MaterialSingle(shaderPrograms.at("skinning"));
+    dimwavesMat->loadTexture(FileSystem::getPath("resources/textures/dimensionwaves.jpg"), GL_RGB);
     dimwavesMat->setMaterialProps(glm::vec3(0.2f), 16);
     materials.insert(std::pair<std::string, Material*>("dimensionwaves", dimwavesMat));
 
-    Material* woodMat = new Material(shaderPrograms.at("skinning"));
-    woodMat->loadTexture(FileSystem::getPath("resources/textures/wood.jpg"));
+    Material* woodMat = new MaterialSingle(shaderPrograms.at("skinning"));
+    woodMat->loadTexture(FileSystem::getPath("resources/textures/wood.jpg"), GL_RGB);
     //woodMat->generateTexture(256, 256);
     woodMat->setMaterialProps(glm::vec3(0.004f), 256);
     materials.insert(std::pair<std::string, Material*>("wood", woodMat));
 
-    Material* weedMat = new Material(shaderPrograms.at("alphaTest"));
-    weedMat->loadTexture(FileSystem::getPath("resources/textures/weed.png"));
+    Material* weedMat = new MaterialSingle(shaderPrograms.at("alphaTest"));
+    weedMat->loadTexture(FileSystem::getPath("resources/textures/weed.png"), GL_RGBA);
     weedMat->setMaterialProps(glm::vec3(0.02f), 16);
     materials.insert(std::pair<std::string, Material*>("weed", weedMat));
 }
@@ -361,6 +358,10 @@ void App::initShaders()
     std::string alphaFS = FileSystem::getPath("resources/shaders/alphaFs.glsl");
     Shader* alphaShader = new Shader(alphaVS, alphaFS);
     shaderPrograms.insert(std::pair<std::string, Shader*>("alphaTest", alphaShader));
+
+    std::string groundFS = FileSystem::getPath("resources/shaders/groundFs.glsl");
+    Shader* groundShader = new Shader(basicVS, groundFS);
+    shaderPrograms.insert(std::pair<std::string, Shader*>("ground", groundShader));
 }
 
 void App::processInput() 

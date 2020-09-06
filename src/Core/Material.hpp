@@ -15,33 +15,28 @@
 #include <sstream>
 
 #include "Include/stb_image.hpp"
-#include "Include/filesystem.hpp"
 #include "Shader.hpp"
-#include "Algorithm/NoiseGen.hpp"
 
 class Material
 {
-private:
+protected:
     Shader* shader;
-    std::string type;
-    std::string filePath;
 
-    GLuint diffuse;
-    glm::vec3 specular;    
-    float shininess;
-
-    std::vector<float>* generatedData;
-
-    void initBuffer();
+    virtual void initBuffer() = 0;
 
 public:
-    Material(Shader* shader);
-    void loadTexture(std::string filePath);
-    void generateTexture(int width, int height);
-    std::string getName();
-    void setMaterialProps(glm::vec3 specular, float shininess);
-    void setModelMatrix(glm::mat4& model, glm::mat4& normal);
-    void setCameraPos(glm::vec3& pos);
-    void draw();
-    ~Material();
+    Material(Shader* shader) { this->shader = shader; };
+    virtual void loadTexture(std::string filePath, int colorMode) = 0;
+    virtual void generateTexture(int width, int height) = 0;
+
+    virtual void setMaterialProps(glm::vec3 specular, float shininess) = 0;
+    void setModelMatrix(glm::mat4& model, glm::mat4& normal){
+        shader->setMatrix("model", model);
+        shader->setMatrix("normalMatrix", normal);
+    };
+    void setCameraPos(glm::vec3& pos){
+        shader->setVec3("camera.positon", pos);
+    };
+    virtual void draw() = 0;
+    virtual ~Material() {};
 };

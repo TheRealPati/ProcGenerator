@@ -4,7 +4,6 @@ out vec4 outColor;
 
 struct Material 
 {
-    sampler2D diffuse;
     vec3 specular;    
     float shininess;
 }; 
@@ -72,6 +71,7 @@ uniform Camera camera;
 vec3 calcDirectionLight(DirectionLight light, vec3 normal, vec3 viewDir);
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 viewDir);
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 viewDir);
+vec3 calcTexFromHeight();
 
 void main(){
     vec3 viewDir = normalize(camera.position - modelPosition);
@@ -94,8 +94,9 @@ vec3 calcDirectionLight(DirectionLight light, vec3 normal, vec3 viewDir)
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
-    vec3 ambient = light.ambient * vec3(texture(material.diffuse, texCoords));
-    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoords));
+    vec3 texPoint = calcTexFromHeight();
+    vec3 ambient = light.ambient * texPoint;
+    vec3 diffuse = light.diffuse * diff * texPoint;
     vec3 specular = light.specular * (spec * material.specular);
     return (ambient + diffuse + specular);
 }
@@ -111,8 +112,9 @@ vec3 calcPointLight(PointLight light, vec3 normal, vec3 viewDir)
     float distance = length(light.position - modelPosition);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
-    vec3 ambient = light.ambient * vec3(texture(material.diffuse, texCoords));
-    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoords));
+    vec3 texPoint = calcTexFromHeight();
+    vec3 ambient = light.ambient * texPoint;
+    vec3 diffuse = light.diffuse * diff * texPoint;
     vec3 specular = light.specular * (spec * material.specular);
 
     ambient *= attenuation;
@@ -136,12 +138,18 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 viewDir)
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
-    vec3 ambient = light.ambient * vec3(texture(material.diffuse, texCoords));
-    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoords));
+    vec3 texPoint = calcTexFromHeight();
+    vec3 ambient = light.ambient * texPoint;
+    vec3 diffuse = light.diffuse * diff * texPoint;
     vec3 specular = light.specular * (spec * material.specular);
 
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
     return (ambient + diffuse + specular);
+}
+
+vec3 calcTexFromHeight()
+{
+        return vec3(0.3f, 0.4f, 0.6f);
 }

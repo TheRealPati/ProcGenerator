@@ -1,16 +1,13 @@
-#include "Material.hpp"
+#include "MaterialGroup.hpp"
 
-Material::Material(Shader* shader)
-{
-    this->shader = shader;
-}
+MaterialGroup::MaterialGroup(Shader* shader) : Material(shader){}
 
-Material::~Material()
+MaterialGroup::~MaterialGroup()
 {
     delete generatedData;
 }
 
-void Material::loadTexture(std::string filePath)
+void MaterialGroup::loadTexture(std::string filePath, int colorMode)
 {
     this->filePath = filePath;
     this->initBuffer();
@@ -20,7 +17,7 @@ void Material::loadTexture(std::string filePath)
     unsigned char *data = stbi_load(filePath.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, colorMode, width, height, 0, colorMode, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -30,10 +27,11 @@ void Material::loadTexture(std::string filePath)
     stbi_image_free(data);
 }
 
-void Material::initBuffer()
+void MaterialGroup::initBuffer()
 {
-    glGenTextures(1, &diffuse);
-    glBindTexture(GL_TEXTURE_2D, diffuse); 
+    glGenTextures(1, &currentID);
+    glBindTexture(GL_TEXTURE_2D, currentID); 
+    texIDs.push_back(currentID);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -41,7 +39,7 @@ void Material::initBuffer()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
-void Material::generateTexture(int width, int height)
+void MaterialGroup::generateTexture(int width, int height)
 {
     this->initBuffer();
 
@@ -52,6 +50,8 @@ void Material::generateTexture(int width, int height)
         for(int j = 0; j < height; j++)
         {
             float intensity = noiseGen.woodValue(glm::vec2((double)i, (double)j));
+            //TODO Tweak
+            if(intensity > 0.4f) intensity *= 0.3f;
             generatedData->emplace_back(intensity);
             generatedData->emplace_back(intensity);
             generatedData->emplace_back(intensity);
@@ -62,35 +62,22 @@ void Material::generateTexture(int width, int height)
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-void Material::setMaterialProps(glm::vec3 specular, float shininess)
+void MaterialGroup::setMaterialProps(glm::vec3 specular, float shininess)
 {
     this->specular = specular;
     this->shininess = shininess;
 }
 
-std::string Material::getName()
-{
-    return filePath;
-}
-
-void Material::draw()
+void MaterialGroup::draw()
 {
     shader->use();
-    glBindTexture(GL_TEXTURE_2D, diffuse);
-    glActiveTexture(GL_TEXTURE0);
-    shader->setInt("material.diffuse", 0);
+    for(unsigned int i = 0; i < texIDs.size(); i++)
+    {
+        shader->setInt("texture" + std::to_string(i) + ".texMap", i);
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, texIDs[i]);
+    }
     shader->setVec3("material.specular", specular);
     shader->setFloat("material.shininess", shininess);
-}
-
-void Material::setModelMatrix(glm::mat4& model, glm::mat4& normal)
-{
-    shader->setMatrix("model", model);
-    shader->setMatrix("normalMatrix", normal);
-}
-
-void Material::setCameraPos(glm::vec3& pos)
-{
-    shader->setVec3("camera.positon", pos);
 }
 
