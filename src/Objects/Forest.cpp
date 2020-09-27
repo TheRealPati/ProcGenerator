@@ -164,9 +164,9 @@ glm::vec3 Forest::getCurrentAxis(ColonBranch* branch)
         if(branch->leafCount == 0)
             axis = glm::vec3(0.0f, 0.0f, 1.0f);
         else if(branch->leafCount == 1)
-            axis = glm::normalize(glm::vec3(1.0f, 0.0f, -1.0f));
+            axis = glm::normalize(glm::vec3(0.0f, 1.0f, -1.0f));
         else if(branch->leafCount == 2)
-            axis = glm::normalize(glm::vec3(-1.0f, 0.0f, -1.0f));
+            axis = glm::normalize(glm::vec3(0.0f, -1.0f, -1.0f));
     }
     //Fourway
     else if(branch->childrenCount == 3)
