@@ -23,22 +23,12 @@
 class MaterialSingle : public Material
 {
 private:
-    std::string type;
-    std::string filePath;
-
     GLuint diffuse;
-    glm::vec3 specular;    
-    float shininess;
-
-    std::vector<float>* generatedData;
 
     virtual void initBuffer();
 
 public:
     MaterialSingle(Shader* shader);
-    virtual void loadTexture(std::string filePath, int colorMode);
-    virtual void generateTexture(int width, int height);
-    virtual void setMaterialProps(glm::vec3 specular, float shininess);
     virtual void draw();
     ~MaterialSingle();
 };

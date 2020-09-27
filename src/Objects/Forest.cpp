@@ -36,10 +36,10 @@ void Forest::populate(unsigned int maxSideSize, std::vector<glm::mat4>& places, 
         }
     }
 
-    importer.loadModel("resources/models/2way_rig.dae", ModelType::RIGGED);
+    importer.loadModel("resources/models/2_generated.dae", ModelType::RIGGED);
     twoWayMesh = new RiggedMesh(importer.getVertexData(), importer.getIndices(), importer.getWeights(), pieceInstanceInfo["twoWay"]);
 
-    importer.loadModel("resources/models/3way_rig.dae", ModelType::RIGGED);
+    importer.loadModel("resources/models/3_generated.dae", ModelType::RIGGED);
     threeWayMesh = new RiggedMesh(importer.getVertexData(), importer.getIndices(), importer.getWeights(), pieceInstanceInfo["threeWay"]);
 
     importer.loadModel("resources/models/4way_rig.dae", ModelType::RIGGED);

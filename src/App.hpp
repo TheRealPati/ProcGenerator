@@ -66,8 +66,8 @@ enum class TerrainAlgorithm
 class App
 {
 private:
-    const int windowWidth = 800;
-    const int windowHeight = 600;
+    const int windowWidth = 1280;
+    const int windowHeight = 720;
 
     Randomizer& randomizer;
 

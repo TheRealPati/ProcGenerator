@@ -16,7 +16,7 @@ void Importer::loadModel(std::string path, ModelType type)
 
     this->type = type;
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(FileSystem::getPath(path), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+    const aiScene* scene = importer.ReadFile(FileSystem::getPath(path), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_JoinIdenticalVertices);
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         fprintf(stderr, "[ERROR] Assimp: %s!\n", importer.GetErrorString() );

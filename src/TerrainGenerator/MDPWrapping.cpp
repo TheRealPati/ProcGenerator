@@ -3,10 +3,16 @@
 MDPWrapping::MDPWrapping(int surfaceSideSize, int density, Randomizer& randomizer)
 : TerrainGenAlgo(surfaceSideSize, density, randomizer)
 {
-    setSmoothFilter(1);
+    setSmoothFilter(2);
 }
 
 MDPWrapping::~MDPWrapping(){}
+
+void MDPWrapping::boundCheck(float point)
+{
+    if(maxY < point) maxY = point;
+    if(minY > point) minY = point;
+}
 
 void MDPWrapping::centerStep(std::vector<std::vector<VertexPNT>>&vertices, std::vector<int>& corners, float disp) {
     for(unsigned int i = 0; i < corners.size(); i+=4)
@@ -23,7 +29,9 @@ void MDPWrapping::centerStep(std::vector<std::vector<VertexPNT>>&vertices, std::
             vertices[min_x][max_z].position.y +
             vertices[max_x][min_z].position.y +
             vertices[max_x][max_z].position.y
-        )/4 + this->rand() * disp;
+        )/4 + this->randCenterZero() * disp;
+
+        boundCheck(vertices[avgOfX][avgOfZ].position.y);
     }
 }
 
@@ -54,6 +62,7 @@ std::vector<int> MDPWrapping::sideStep(std::vector<std::vector<VertexPNT>>& vert
             rightPoint /= 3;
         }
         //rightPoint += this->rand() * disp;
+        boundCheck(rightPoint);
         vertices[avgOfX+currentLength][avgOfZ].position.y = rightPoint;
 
         // Left side
@@ -71,6 +80,7 @@ std::vector<int> MDPWrapping::sideStep(std::vector<std::vector<VertexPNT>>& vert
             leftPoint /= 3;
         }
         //leftPoint += this->rand() * disp;
+        boundCheck(leftPoint);
         vertices[avgOfX-currentLength][avgOfZ].position.y = leftPoint;
 
         // Up side
@@ -88,6 +98,7 @@ std::vector<int> MDPWrapping::sideStep(std::vector<std::vector<VertexPNT>>& vert
             upPoint /= 3;
         }
         //upPoint += this->rand() * disp;
+        boundCheck(upPoint);
         vertices[avgOfX][avgOfZ+currentLength].position.y = upPoint;
 
         // Down side
@@ -105,6 +116,7 @@ std::vector<int> MDPWrapping::sideStep(std::vector<std::vector<VertexPNT>>& vert
             downPoint /= 3;
         }
         //downPoint += this->rand() * disp;
+        boundCheck(downPoint);
         vertices[avgOfX][avgOfZ-currentLength].position.y = downPoint;
 
         //Push the new corners
@@ -152,10 +164,11 @@ void MDPWrapping::modifyTerrain(std::vector<VertexPNT>& vertices)
         int min_z = 0;
 
         // Initial values
-        vertices2D[min_x][min_z].position.y = this->rand() * 100.0f;
-        vertices2D[min_x][max_z].position.y = this->rand() * 100.0f;
-        vertices2D[max_x][min_z].position.y = this->rand() * 100.0f;
-        vertices2D[max_x][max_z].position.y = this->rand() * 100.0f;
+        minY = maxY = 0.0f;
+        vertices2D[min_x][min_z].position.y = minY;
+        vertices2D[min_x][max_z].position.y = minY;
+        vertices2D[max_x][min_z].position.y = minY;
+        vertices2D[max_x][max_z].position.y = minY;
 
         std::vector<int> corners = {min_x, max_x, min_z, max_z};
 
@@ -177,6 +190,9 @@ void MDPWrapping::modifyTerrain(std::vector<VertexPNT>& vertices)
         {
             for(unsigned int j = 0; j < surfaceSideSize; j++)
             {
+                vertices2D[i][j].position.y -= minY;
+                vertices2D[i][j].position.y *= 120.0f;
+                vertices2D[i][j].position.y /= (maxY-minY);
                 vertices.emplace_back(vertices2D[i][j]);
             }
         }

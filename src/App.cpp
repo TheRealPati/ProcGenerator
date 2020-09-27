@@ -116,8 +116,12 @@ void App::createMaterials()
     //Creating mats
     Material* surfaceMat = new MaterialGroup(shaderPrograms.at("ground"));
     surfaceMat->generateTexture(256, 256);
-    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/grass.jpg"), GL_RGB);
-    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"), GL_RGB);
+    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/dirt.jpg"), GL_RGB); //1
+    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/grass.jpg"), GL_RGB); //2
+    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/dirtrock.jpg"), GL_RGB); //3
+    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/rock.jpg"), GL_RGB); //4
+    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/water.jpg"), GL_RGB); //5
+    surfaceMat->loadTexture(FileSystem::getPath("resources/textures/snow.jpg"), GL_RGB); //6
     surfaceMat->setMaterialProps(glm::vec3(0.2f), 32);
     materials.insert(std::pair<std::string, Material*>("surface", surfaceMat));
 
@@ -184,7 +188,7 @@ void App::generateTerrain()
 
 void App::generateTrees()
 {
-    Forest* forest = new Forest(randomizer, scatterer, 10);
+    Forest* forest = new Forest(randomizer, scatterer, 30);
     forest->populate(maxSideSize, places, skinning);
 
     Mesh* threeWayMesh = forest->getThreeWayMesh();
