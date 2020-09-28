@@ -9,6 +9,7 @@
 
 // Standard Headers
 #include <vector>
+#include <map>
 #include <cstdio>
 #include <string>
 #include <fstream>
@@ -41,10 +42,10 @@ public:
     void populate(unsigned int maxSideSize, std::vector<glm::mat4>& places, std::vector<glm::mat4>& skinning);
 
     void mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, std::vector<glm::mat4>& skinning);
-    void mutateBranchParent(ColonBranch* branch, ColonBranch* child, std::vector<glm::mat4>& skinning);
+    //void mutateBranchParent(ColonBranch* branch, ColonBranch* child, std::vector<glm::mat4>& skinning);
 
-    glm::vec3 getCurrentAxis(ColonBranch* branch);
-    glm::mat4 calcRotMat(const glm::vec3& originalAxis, const glm::vec3& modifiedAxis);
+    //int getCurrentAxis(ColonBranch* branch, const glm::vec3& currentAxis);
+    void fillInitialDirections(ColonBranch* branch);
 
     std::vector<InstanceInfo> getInstanceInfo(std::string key);
     Mesh* getThreeWayMesh();

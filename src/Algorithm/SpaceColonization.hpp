@@ -17,6 +17,8 @@ struct ColonBranch
     unsigned int childrenCount = 0;
     unsigned int leafCount = 0;
     unsigned int instanceID = 0;
+    std::vector<glm::vec3> directions = {};
+    std::vector<glm::vec3> childDirections = {};
 };
 
 class SpaceColonization 

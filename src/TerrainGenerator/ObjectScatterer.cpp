@@ -27,13 +27,14 @@ glm::vec3 ObjectScatterer::getNormal(float x, float z)
     return qtree->search(x,z)->normal;
 }
 
-glm::mat4 ObjectScatterer::calcRotMat(const glm::vec3& originalAxis, const glm::vec3& modifiedAxis)
+glm::mat4 ObjectScatterer::calcRotMat(glm::vec3& originalAxis, const glm::vec3& modifiedAxis)
 {
     glm::vec3 axis = glm::cross(originalAxis, modifiedAxis);
     float angle = acos(glm::dot(originalAxis, modifiedAxis));
     glm::mat4 rotMat = glm::mat4(1.0f);
     if(angle != 0)
         rotMat = glm::rotate(glm::mat4(1.0f), angle, axis);
+    //originalAxis = glm::vec3(rotMat * glm::vec4(originalAxis, 1.0));
 
     return rotMat;
 }
