@@ -108,3 +108,8 @@ void UniformBufferObject::setSpotLights(SpotLight* light)
     
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
+
+UniformBufferObject::~UniformBufferObject()
+{
+    glDeleteBuffers(1, &UBO);
+}

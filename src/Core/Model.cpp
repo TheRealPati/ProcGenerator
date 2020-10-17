@@ -30,5 +30,7 @@ void Model::draw(glm::mat4& model, glm::mat4& normal, glm::vec3& cameraPos, int 
 
 Model::~Model()
 {
-
+    for(unsigned int i = 0; i < meshes.size(); i++){
+        delete meshes[i];
+    }
 }

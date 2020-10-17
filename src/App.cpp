@@ -9,18 +9,50 @@ App::App(Randomizer& randomizer) : randomizer(randomizer)
 
 App::~App()
 {
-    for(auto* object : objects){
-        free(object);
+    glfwTerminate();
+
+    //Lights
+    delete dirLight;
+    delete lights[0];
+    delete lights[1];
+    delete lights[2];
+    delete lights[3];
+    delete spotLight;
+
+    //UBO
+    delete matrixUbo;
+    delete pointsUbo;
+    delete directionUbo;
+    delete spotUbo;
+
+    //SSBO
+    delete modelMatrixes;
+    delete skinningMatrixes;
+    delete groundBillboardMatrixes;
+    delete leafBillboardMatrixes;
+
+    delete grass;
+    delete forest;
+    delete lodManager;
+    delete scatterer;
+    delete camera;
+
+    for(GameObject* object : objects){
+        delete object;
+    }
+
+    for(std::pair<std::string, Material*> matPair : materials){
+        Material* mat = matPair.second;
+        delete mat;
     }
 
     for(std::pair<std::string, Shader*> program : shaderPrograms){
         Shader* shader = program.second;
-        glDeleteProgram(shader->getID());
+        delete shader;
     }
 
     fprintf(stderr, "[INFO] Clean up done!\n");
     
-    glfwTerminate();
 }
 
 void debugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
@@ -145,6 +177,11 @@ void App::createMaterials()
     weedMat->loadTexture(FileSystem::getPath("resources/textures/weed.png"), GL_RGBA);
     weedMat->setMaterialProps(glm::vec3(0.02f), 16);
     materials.insert(std::pair<std::string, Material*>("weed", weedMat));
+
+    Material* leafMat = new MaterialSingle(shaderPrograms.at("leaf"));
+    leafMat->loadTexture(FileSystem::getPath("resources/textures/leaf.png"), GL_RGBA);
+    leafMat->setMaterialProps(glm::vec3(0.02f), 16);
+    materials.insert(std::pair<std::string, Material*>("leaf", leafMat));
 }
 
 void App::generateTerrain()
@@ -183,56 +220,34 @@ void App::generateTerrain()
     GameObject* surfaceObject = new GameObject();
     surfaceObject->setModel(surfaceModel);
 
+    delete generator;
+
     objects.push_back(surfaceObject);
 }
 
 void App::generateTrees()
 {
-    Forest* forest = new Forest(randomizer, scatterer, 30);
-    forest->populate(maxSideSize, places, skinning);
+    forest = new Forest(randomizer, scatterer, 30);
+    forest->populate(maxSideSize, places, skinning, leafBillboard);
+}
 
-    Mesh* threeWayMesh = forest->getThreeWayMesh();
+void App::generateBranchObjects(){
+    lodManager = new LodManager();
+    lodManager->loadObjects(materials["wood"]);
 
-    Model* threeWayModel = new Model();
-    threeWayModel->addMesh(threeWayMesh);
-    threeWayModel->addMat(materials["wood"], 0);
-
-    GameObject* threeWayObject = new GameObject();
-    threeWayObject->setInstanceCount(forest->getInstanceInfo("threeWay").size());
-    threeWayObject->setModel(threeWayModel);
-
-    objects.push_back(threeWayObject);
-
-    Mesh* twoWayMesh = forest->getTwoWayMesh();
-
-    Model* twoWayModel = new Model();
-    twoWayModel->addMesh(twoWayMesh);
-    twoWayModel->addMat(materials["wood"], 0);
-
-    GameObject* twoWayObject = new GameObject();
-
-    twoWayObject->setInstanceCount(forest->getInstanceInfo("twoWay").size());
-    twoWayObject->setModel(twoWayModel);
-
-    objects.push_back(twoWayObject);
-
-    Mesh* fourWayMesh = forest->getFourWayMesh();
-
-    Model* fourWayModel = new Model();
-    fourWayModel->addMesh(fourWayMesh);
-    fourWayModel->addMat(materials["wood"], 0);
-
-    GameObject* fourWayObject = new GameObject();
-
-    fourWayObject->setInstanceCount(forest->getInstanceInfo("fourWay").size());
-    fourWayObject->setModel(fourWayModel);
-
-    objects.push_back(fourWayObject);
+    //Low poly
+    objects.push_back(lodManager->getObject(2, true));
+    objects.push_back(lodManager->getObject(3, true));
+    objects.push_back(lodManager->getObject(4, true));
+    //High poly
+    objects.push_back(lodManager->getObject(2, false));
+    objects.push_back(lodManager->getObject(3, false));
+    objects.push_back(lodManager->getObject(4, false));
 }
 
 void App::generateGroundFoliage()
 {
-    Grassfield* grass = new Grassfield(randomizer, scatterer);
+    grass = new Grassfield(randomizer, scatterer);
     grass->populate(maxSideSize, groundBillboard, 8000);
 
     CrossedPlane plane = CrossedPlane(1.0f);
@@ -251,6 +266,24 @@ void App::generateGroundFoliage()
     objects.push_back(grassObject);
 }
 
+void App::generateLeafFoliage()
+{
+    CrossedPlane plane = CrossedPlane(1.0f);
+
+    Mesh* leafMesh = new InstancedMesh(plane.getVertexData(), plane.getIndexData());
+
+    Model* leafModel = new Model();
+    leafModel->addMesh(leafMesh);
+    leafModel->addMat(materials["leaf"], 0);
+
+    GameObject* leafObject = new GameObject();
+
+    leafObject->setInstanceCount(leafBillboard.size());
+    leafObject->setModel(leafModel);
+
+    objects.push_back(leafObject);
+}
+
 void App::sceneSetup()
 {
     camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -267,6 +300,8 @@ void App::sceneSetup()
     fprintf(stderr, "[INFO] Positioning objects...\n");
     generateTrees();
     generateGroundFoliage();
+    generateLeafFoliage();
+    generateBranchObjects();
 
     fprintf(stderr, "[INFO] Objects loaded!\n");
 
@@ -320,9 +355,11 @@ void App::sceneSetup()
     modelMatrixes = new ShaderStorageBuffer(4);
     skinningMatrixes = new ShaderStorageBuffer(5);
     groundBillboardMatrixes = new ShaderStorageBuffer(6);
+    leafBillboardMatrixes = new ShaderStorageBuffer(7);
     modelMatrixes->preserveMat(places.size(), 2);
     skinningMatrixes->preserveMat(skinning.size(), 1);
     groundBillboardMatrixes->preserveMat(groundBillboard.size(), 1);
+    leafBillboardMatrixes->preserveMat(leafBillboard.size(), 1);
 
     for(unsigned int i = 0; i < places.size(); i++)
     {
@@ -337,6 +374,10 @@ void App::sceneSetup()
     {
         groundBillboardMatrixes->setSkinningMat(groundBillboard[i], i);
     }
+    for(unsigned int i = 0; i < leafBillboard.size(); i++)
+    {
+        leafBillboardMatrixes->setSkinningMat(leafBillboard[i], i);
+    }
 
     fprintf(stderr, "[INFO] Okay, okay, should be ready.\n");
 
@@ -345,6 +386,50 @@ void App::sceneSetup()
 void App::bindUniforms()
 {
     matrixUbo->setVPmatrix(camera->getView(), projection);
+}
+
+void App::setModelDetails()
+{
+    std::vector<InstanceInfo> small;
+    std::vector<InstanceInfo> big;
+
+    //2 way objects
+    for(InstanceInfo i : forest->getInstanceInfo("twoWay"))
+    {
+        if(glm::length(places[i.modelMatIndex][3].xyz() - camera->getPos()) < lodDistance)
+            small.emplace_back(i);
+        else
+            big.emplace_back(i);
+    }
+    lodManager->setObject(small, 2, false);
+    lodManager->setObject(big, 2, true);
+    small.clear();
+    big.clear();
+    //3 way objects
+    for(InstanceInfo i : forest->getInstanceInfo("threeWay"))
+    {
+        if(glm::length(places[i.modelMatIndex][3].xyz() - camera->getPos()) < lodDistance)
+            small.emplace_back(i);
+        else
+            big.emplace_back(i);
+    }
+    lodManager->setObject(small, 3, false);
+    lodManager->setObject(big, 3, true);
+    small.clear();
+    big.clear();
+
+    //3 way objects
+    for(InstanceInfo i : forest->getInstanceInfo("fourWay"))
+    {
+        if(glm::length(places[i.modelMatIndex][3].xyz() - camera->getPos()) < lodDistance)
+            small.emplace_back(i);
+        else
+            big.emplace_back(i);
+    }
+    lodManager->setObject(small, 4, false);
+    lodManager->setObject(big, 4, true);
+    small.clear();
+    big.clear();
 }
 
 void App::initShaders()
@@ -362,6 +447,10 @@ void App::initShaders()
     std::string alphaFS = FileSystem::getPath("resources/shaders/alphaFs.glsl");
     Shader* alphaShader = new Shader(alphaVS, alphaFS);
     shaderPrograms.insert(std::pair<std::string, Shader*>("alphaTest", alphaShader));
+
+    std::string leafVs = FileSystem::getPath("resources/shaders/leafVs.glsl");
+    Shader* leafShader = new Shader(leafVs, alphaFS);
+    shaderPrograms.insert(std::pair<std::string, Shader*>("leaf", leafShader));
 
     std::string groundFS = FileSystem::getPath("resources/shaders/groundFs.glsl");
     Shader* groundShader = new Shader(basicVS, groundFS);
@@ -408,6 +497,7 @@ void App::loop()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         this->bindUniforms();
+        this->setModelDetails();
 
         for(auto* object : objects)
         {

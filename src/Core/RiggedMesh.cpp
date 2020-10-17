@@ -10,6 +10,24 @@ RiggedMesh::RiggedMesh(std::vector<VertexPNT> vertexData, std::vector<GLuint> in
     setup();
 }
 
+void RiggedMesh::setInstanceInfo(std::vector<InstanceInfo> instanceData)
+{
+    this->instanceData = instanceData;
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); 
+    glBufferData(GL_ARRAY_BUFFER, instanceData.size() * sizeof(InstanceInfo), &instanceData[0], GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(3); 
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceInfo), (void*)offsetof(InstanceInfo, boneIndices));
+    glVertexAttribDivisor(3, 1);
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(InstanceInfo), (void*)offsetof(InstanceInfo, modelMatIndex));
+    glVertexAttribDivisor(5, 1);
+
+}
+
 void RiggedMesh::setup()
 {
     glGenVertexArrays(1, &VAO);

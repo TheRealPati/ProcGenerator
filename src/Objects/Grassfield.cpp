@@ -25,3 +25,8 @@ void Grassfield::populate(unsigned int maxSideSize, std::vector<glm::mat4>& bill
     }
 
 }
+
+Grassfield::~Grassfield()
+{
+    
+}

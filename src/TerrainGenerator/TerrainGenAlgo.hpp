@@ -18,7 +18,7 @@ protected:
 public:
     TerrainGenAlgo(int surfaceSideSize, int density, Randomizer& rand);
     virtual void modifyTerrain(std::vector<VertexPNT>& vertices);
-    ~TerrainGenAlgo();
+    virtual ~TerrainGenAlgo();
 
     std::vector<VertexPNT> generateVertices();
     std::vector<GLuint> generateIndices();

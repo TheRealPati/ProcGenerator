@@ -42,7 +42,7 @@ void SpaceColonization::bodyGrow(ColonBranch* root, std::vector<ColonBranch*>& g
         if(!firstLeafFound)
         {
             glm::vec3 newDir = glm::normalize(current->direction + glm::vec3(0.0f, 1.0f, 0.0f));
-            glm::vec3 newPos = current->pos + newDir * 0.35f;
+            glm::vec3 newPos = current->pos + newDir * 0.385f;
             ColonBranch* branch = new ColonBranch({newPos, newDir, newDir, current});
             current->childrenCount++;
             generatedBranches.emplace_back(branch);
@@ -95,7 +95,7 @@ void SpaceColonization::leafGrow(std::vector<ColonBranch*>& generatedBranches)
     {
         if (branch->leafCount > 0) {
             glm::vec3 newDir = glm::normalize(branch->direction + glm::vec3(0.0f, 1.0f, 0.0f));
-            glm::vec3 newPos = branch->pos + branch->direction * 0.35f;
+            glm::vec3 newPos = branch->pos + branch->direction * 0.385f;
             ColonBranch* newBranch = new ColonBranch({newPos, newDir, newDir, branch});
             branch->childrenCount++;
             addable.emplace_back(newBranch);

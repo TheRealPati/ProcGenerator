@@ -14,9 +14,8 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <algorithm>  
 
-#include "Core/Mesh.hpp"
-#include "Core/Importer.hpp"
 #include "Utils.hpp"
 #include "TerrainGenerator/ObjectScatterer.hpp"
 #include "Algorithm/RegionFrames/RegionSeeder.hpp"
@@ -30,27 +29,18 @@ private:
     unsigned int treeCount;
 
     //LEGO pieces
-    Importer importer;
     std::map<std::string, std::vector<InstanceInfo>> pieceInstanceInfo;
-
-    Mesh* twoWayMesh;
-    Mesh* threeWayMesh;
-    Mesh* fourWayMesh;
 
 public:
     Forest(Randomizer& randomizer, ObjectScatterer* scatterer, unsigned int treeCount);
-    void populate(unsigned int maxSideSize, std::vector<glm::mat4>& places, std::vector<glm::mat4>& skinning);
+    void populate(unsigned int maxSideSize, std::vector<glm::mat4>& places, std::vector<glm::mat4>& skinning, std::vector<glm::mat4>& leafBillboard);
 
     void mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, std::vector<glm::mat4>& skinning);
-    //void mutateBranchParent(ColonBranch* branch, ColonBranch* child, std::vector<glm::mat4>& skinning);
 
-    //int getCurrentAxis(ColonBranch* branch, const glm::vec3& currentAxis);
+    glm::mat4 scaleEndPiece(glm::mat4& mat);
     void fillInitialDirections(ColonBranch* branch);
 
     std::vector<InstanceInfo> getInstanceInfo(std::string key);
-    Mesh* getThreeWayMesh();
-    Mesh* getTwoWayMesh();
-    Mesh* getFourWayMesh();
 
     ~Forest();
 };

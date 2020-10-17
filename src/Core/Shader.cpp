@@ -14,6 +14,11 @@ Shader::Shader(std::string& vertexShaderName, std::string& fragmentShaderName)
     ID = compileShaders(vertexProgram, fragmentProgram);
 }
 
+Shader::~Shader()
+{
+    glDeleteProgram(ID);
+}
+
 std::string Shader::loadContent(std::string filename)
 {
     // Shaders

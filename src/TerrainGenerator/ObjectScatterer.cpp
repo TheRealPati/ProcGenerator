@@ -27,7 +27,7 @@ glm::vec3 ObjectScatterer::getNormal(float x, float z)
     return qtree->search(x,z)->normal;
 }
 
-glm::mat4 ObjectScatterer::calcRotMat(glm::vec3& originalAxis, const glm::vec3& modifiedAxis)
+glm::mat4 ObjectScatterer::calcRotMat(const glm::vec3& originalAxis, const glm::vec3& modifiedAxis)
 {
     glm::vec3 axis = glm::cross(originalAxis, modifiedAxis);
     float angle = acos(glm::dot(originalAxis, modifiedAxis));
@@ -41,5 +41,5 @@ glm::mat4 ObjectScatterer::calcRotMat(glm::vec3& originalAxis, const glm::vec3& 
 
 ObjectScatterer::~ObjectScatterer()
 {
-
+    delete qtree;
 }

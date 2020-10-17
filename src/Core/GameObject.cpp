@@ -28,5 +28,6 @@ void GameObject::setInstanceCount(int count)
 
 GameObject::~GameObject()
 {
-
+    if(model)
+        delete model;
 }

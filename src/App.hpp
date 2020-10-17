@@ -1,6 +1,7 @@
 #pragma once
 // System Headers
 #define GL_GLEXT_PROTOTYPES
+#define GLM_FORCE_SWIZZLE
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/euler_angles.hpp>
@@ -17,6 +18,7 @@
 #include <utility>
 #include <fstream>
 #include <sstream>
+#include <cmath>
 
 // App Headers
 #include "TerrainGenerator/PlainGen.hpp"
@@ -29,6 +31,7 @@
 
 #include "Objects/Camera.hpp"
 #include "Objects/PointLight.hpp"
+#include "Objects/LodManager.hpp"
 #include "Objects/Forest.hpp"
 #include "Objects/Grassfield.hpp"
 
@@ -84,10 +87,13 @@ private:
 
     TerrainAlgorithm terrainGenerator = TerrainAlgorithm::MDP_WRAP;
     float maxSideSize;
+
+    Importer importer;
     ObjectScatterer* scatterer;
     std::vector<glm::mat4> places;
     std::vector<glm::mat4> skinning = { glm::mat4(1.0f) };
     std::vector<glm::mat4> groundBillboard;
+    std::vector<glm::mat4> leafBillboard;
     glm::mat4 projection;
 
     GLFWwindow* window;
@@ -95,6 +101,10 @@ private:
     std::vector<GameObject*> objects;
     std::map<std::string, Material*> materials;
     Camera* camera;
+    Forest* forest;
+    Grassfield* grass;
+    LodManager* lodManager;
+    const float lodDistance = 50.0f;
 
     PointLight* lights[4];
     DirectionalLight* dirLight;
@@ -107,6 +117,7 @@ private:
     ShaderStorageBuffer* modelMatrixes;
     ShaderStorageBuffer* skinningMatrixes;
     ShaderStorageBuffer* groundBillboardMatrixes;
+    ShaderStorageBuffer* leafBillboardMatrixes;
 
 public:
     App(Randomizer& randomizer);
@@ -119,8 +130,11 @@ public:
     void generateTerrain();
     void generateTrees();
     void generateGroundFoliage();
+    void generateLeafFoliage();
+    void generateBranchObjects();
 
     void bindUniforms();
+    void setModelDetails();
     void processInput();
     void calculateDeltaTime();
 

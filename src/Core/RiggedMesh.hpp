@@ -28,6 +28,7 @@ private:
 
 public:
     RiggedMesh(std::vector<VertexPNT> vertexData, std::vector<GLuint> indices, std::vector<glm::vec4> skinning, std::vector<InstanceInfo> instanceData);
+    void setInstanceInfo(std::vector<InstanceInfo> instanceData);
     virtual void draw(int count);
     ~RiggedMesh();
 };

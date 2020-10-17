@@ -92,3 +92,15 @@ bool QuadTree::inBoundary(float x, float z)
         z >= topLeftZ && 
         z < botRightZ); 
 }
+
+QuadTree::~QuadTree()
+{
+    if(topLeftTree != NULL)
+        delete topLeftTree;
+    if(topRightTree != NULL)
+        delete topRightTree;
+    if(botLeftTree != NULL)
+        delete botLeftTree;
+    if(botRightTree != NULL)
+        delete botRightTree;
+}

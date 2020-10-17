@@ -16,7 +16,7 @@ public:
     void feedSurfaceData(std::vector<VertexPNT> surfaceData, float maxSideSize);
     float getHeight(float x, float z);
     glm::vec3 getNormal(float x, float z);
-    glm::mat4 calcRotMat(glm::vec3& originalAxis, const glm::vec3& modifiedAxis);
+    glm::mat4 calcRotMat(const glm::vec3& originalAxis, const glm::vec3& modifiedAxis);
     ~ObjectScatterer();
 
 };

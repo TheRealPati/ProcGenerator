@@ -43,3 +43,8 @@ void ShaderStorageBuffer::setVector3(glm::vec3& vec, int index)
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, index * sizeof(glm::vec3), sizeof(glm::vec3), glm::value_ptr(vec));
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
+
+ShaderStorageBuffer::~ShaderStorageBuffer()
+{
+    glDeleteBuffers(1, &SSBO);
+}
