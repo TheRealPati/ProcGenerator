@@ -58,7 +58,7 @@ void Material::setMaterialProps(glm::vec3 specular, float shininess)
 
 void Material::setCameraPos(glm::vec3& pos)
 {
-    shader->setVec3("camera.positon", pos);
+    shader->setVec3("camera", pos);
 }
 
 void Material::setModelMatrix(glm::mat4& model, glm::mat4& normal)

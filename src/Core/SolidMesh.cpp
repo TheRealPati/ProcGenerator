@@ -26,11 +26,6 @@ void SolidMesh::setup()
     glEnableVertexAttribArray(2);  
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPNT), (void*)offsetof(VertexPNT, texCoords));
 
-    /* glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPNT), (void*)offsetof(Vertex, Tangent));
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPNT), (void*)offsetof(Vertex, Bitangent));
-    glEnableVertexAttribArray(4); */
-
     //EBO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);

@@ -23,7 +23,7 @@ struct modelMatrixes
     mat4 normal;
 }; 
 
-struct skinningMatrix 
+struct riggingMatrix 
 {
     mat4 offset;
 }; 
@@ -33,24 +33,24 @@ layout(std430, binding = 4) buffer instanceBuffer
     modelMatrixes matrixes[];
 };
 
-layout(std430, binding = 5) buffer skinningBuffer
+layout(std430, binding = 5) buffer riggingBuffer
 {
-    skinningMatrix skinning[];
+    riggingMatrix rigging[];
 };
 
 void main(){
 
     vec4 skinnedVertexPos = 
-    (skinning[int(boneIndices.x)].offset * vec4(vertexPos, 1.0)) * weights.x +
-    (skinning[int(boneIndices.y)].offset * vec4(vertexPos, 1.0)) * weights.y +
-    (skinning[int(boneIndices.z)].offset * vec4(vertexPos, 1.0)) * weights.z +
-    (skinning[int(boneIndices.w)].offset * vec4(vertexPos, 1.0)) * weights.w;
+    (rigging[int(boneIndices.x)].offset * vec4(vertexPos, 1.0)) * weights.x +
+    (rigging[int(boneIndices.y)].offset * vec4(vertexPos, 1.0)) * weights.y +
+    (rigging[int(boneIndices.z)].offset * vec4(vertexPos, 1.0)) * weights.z +
+    (rigging[int(boneIndices.w)].offset * vec4(vertexPos, 1.0)) * weights.w;
 
     vec4 skinnedVertexNormal = 
-    (skinning[int(boneIndices.x)].offset * vec4(vertexNormal, 1.0)) * weights.x +
-    (skinning[int(boneIndices.y)].offset * vec4(vertexNormal, 1.0)) * weights.y +
-    (skinning[int(boneIndices.z)].offset * vec4(vertexNormal, 1.0)) * weights.z +
-    (skinning[int(boneIndices.w)].offset * vec4(vertexNormal, 1.0)) * weights.w;
+    (rigging[int(boneIndices.x)].offset * vec4(vertexNormal, 1.0)) * weights.x +
+    (rigging[int(boneIndices.y)].offset * vec4(vertexNormal, 1.0)) * weights.y +
+    (rigging[int(boneIndices.z)].offset * vec4(vertexNormal, 1.0)) * weights.z +
+    (rigging[int(boneIndices.w)].offset * vec4(vertexNormal, 1.0)) * weights.w;
 
     vec4 finalPosition = projection * view * matrixes[int(modelMatIndex)].model * skinnedVertexPos;
     modelPosition = (matrixes[int(modelMatIndex)].model * skinnedVertexPos).xyz;

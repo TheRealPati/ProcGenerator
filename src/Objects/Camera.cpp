@@ -50,7 +50,4 @@ glm::vec3& Camera::getPos()
     return pos;
 }
 
-Camera::~Camera()
-{
-    
-}
+Camera::~Camera(){}

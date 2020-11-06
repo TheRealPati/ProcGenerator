@@ -27,7 +27,7 @@ App::~App()
 
     //SSBO
     delete modelMatrixes;
-    delete skinningMatrixes;
+    delete riggingMatrixes;
     delete groundBillboardMatrixes;
     delete leafBillboardMatrixes;
 
@@ -162,12 +162,12 @@ void App::createMaterials()
     perlinMat->setMaterialProps(glm::vec3(0.02f), 32);
     materials.insert(std::pair<std::string, Material*>("perlin", perlinMat));
 
-    Material* dimwavesMat = new MaterialSingle(shaderPrograms.at("skinning"));
+    Material* dimwavesMat = new MaterialSingle(shaderPrograms.at("rigging"));
     dimwavesMat->loadTexture(FileSystem::getPath("resources/textures/dimensionwaves.jpg"), GL_RGB);
     dimwavesMat->setMaterialProps(glm::vec3(0.2f), 16);
     materials.insert(std::pair<std::string, Material*>("dimensionwaves", dimwavesMat));
 
-    Material* woodMat = new MaterialSingle(shaderPrograms.at("skinning"));
+    Material* woodMat = new MaterialSingle(shaderPrograms.at("rigging"));
     woodMat->loadTexture(FileSystem::getPath("resources/textures/wood.jpg"), GL_RGB);
     //woodMat->generateTexture(256, 256);
     woodMat->setMaterialProps(glm::vec3(0.004f), 256);
@@ -228,7 +228,7 @@ void App::generateTerrain()
 void App::generateTrees()
 {
     forest = new Forest(randomizer, scatterer, 30);
-    forest->populate(maxSideSize, places, skinning, leafBillboard);
+    forest->populate(maxSideSize, places, rigging, leafBillboard);
 }
 
 void App::generateBranchObjects(){
@@ -268,7 +268,7 @@ void App::generateGroundFoliage()
 
 void App::generateLeafFoliage()
 {
-    CrossedPlane plane = CrossedPlane(1.0f);
+    Plane plane = Plane(1.3f);
 
     Mesh* leafMesh = new InstancedMesh(plane.getVertexData(), plane.getIndexData());
 
@@ -353,11 +353,11 @@ void App::sceneSetup()
 
     //SSBO
     modelMatrixes = new ShaderStorageBuffer(4);
-    skinningMatrixes = new ShaderStorageBuffer(5);
+    riggingMatrixes = new ShaderStorageBuffer(5);
     groundBillboardMatrixes = new ShaderStorageBuffer(6);
     leafBillboardMatrixes = new ShaderStorageBuffer(7);
     modelMatrixes->preserveMat(places.size(), 2);
-    skinningMatrixes->preserveMat(skinning.size(), 1);
+    riggingMatrixes->preserveMat(rigging.size(), 1);
     groundBillboardMatrixes->preserveMat(groundBillboard.size(), 1);
     leafBillboardMatrixes->preserveMat(leafBillboard.size(), 1);
 
@@ -366,17 +366,17 @@ void App::sceneSetup()
         glm::mat4 normalMatrix = glm::transpose(glm::inverse(places[i]));
         modelMatrixes->setModelMat(places[i], normalMatrix, i);
     }
-    for(unsigned int i = 0; i < skinning.size(); i++)
+    for(unsigned int i = 0; i < rigging.size(); i++)
     {
-        skinningMatrixes->setSkinningMat(skinning[i], i);
+        riggingMatrixes->setMat(rigging[i], i);
     }
     for(unsigned int i = 0; i < groundBillboard.size(); i++)
     {
-        groundBillboardMatrixes->setSkinningMat(groundBillboard[i], i);
+        groundBillboardMatrixes->setMat(groundBillboard[i], i);
     }
     for(unsigned int i = 0; i < leafBillboard.size(); i++)
     {
-        leafBillboardMatrixes->setSkinningMat(leafBillboard[i], i);
+        leafBillboardMatrixes->setMat(leafBillboard[i], i);
     }
 
     fprintf(stderr, "[INFO] Okay, okay, should be ready.\n");
@@ -434,24 +434,29 @@ void App::setModelDetails()
 
 void App::initShaders()
 {
+    //3
     std::string basicVS = FileSystem::getPath("resources/shaders/basicVs.glsl");
     std::string basicFS = FileSystem::getPath("resources/shaders/basicFs.glsl");
     Shader* basicShader = new Shader(basicVS, basicFS);
     shaderPrograms.insert(std::pair<std::string, Shader*>("basic", basicShader));
 
-    std::string skinningVS = FileSystem::getPath("resources/shaders/skinningVs.glsl");
-    Shader* skinningShader = new Shader(skinningVS, basicFS);
-    shaderPrograms.insert(std::pair<std::string, Shader*>("skinning", skinningShader));
+    //6
+    std::string riggingVS = FileSystem::getPath("resources/shaders/riggingVs.glsl");
+    Shader* riggingShader = new Shader(riggingVS, basicFS);
+    shaderPrograms.insert(std::pair<std::string, Shader*>("rigging", riggingShader));
 
+    //9
     std::string alphaVS = FileSystem::getPath("resources/shaders/alphaVs.glsl");
     std::string alphaFS = FileSystem::getPath("resources/shaders/alphaFs.glsl");
     Shader* alphaShader = new Shader(alphaVS, alphaFS);
     shaderPrograms.insert(std::pair<std::string, Shader*>("alphaTest", alphaShader));
 
+    //12
     std::string leafVs = FileSystem::getPath("resources/shaders/leafVs.glsl");
     Shader* leafShader = new Shader(leafVs, alphaFS);
     shaderPrograms.insert(std::pair<std::string, Shader*>("leaf", leafShader));
 
+    //15
     std::string groundFS = FileSystem::getPath("resources/shaders/groundFs.glsl");
     Shader* groundShader = new Shader(basicVS, groundFS);
     shaderPrograms.insert(std::pair<std::string, Shader*>("ground", groundShader));

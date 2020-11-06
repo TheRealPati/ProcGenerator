@@ -34,7 +34,6 @@ glm::mat4 ObjectScatterer::calcRotMat(const glm::vec3& originalAxis, const glm::
     glm::mat4 rotMat = glm::mat4(1.0f);
     if(angle != 0)
         rotMat = glm::rotate(glm::mat4(1.0f), angle, axis);
-    //originalAxis = glm::vec3(rotMat * glm::vec4(originalAxis, 1.0));
 
     return rotMat;
 }

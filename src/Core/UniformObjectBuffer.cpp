@@ -9,7 +9,7 @@ UniformBufferObject::UniformBufferObject(GLuint bindingPoint)
 void UniformBufferObject::preserveVPMatrix()
 {
     glBindBuffer(GL_UNIFORM_BUFFER, UBO);
-    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
     glBindBufferRange(GL_UNIFORM_BUFFER, bindingPoint, UBO, 0, 2 * sizeof(glm::mat4));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
@@ -17,7 +17,7 @@ void UniformBufferObject::preserveVPMatrix()
 void UniformBufferObject::preservePointLight(int countOfLamps)
 {
     glBindBuffer(GL_UNIFORM_BUFFER, UBO);
-    glBufferData(GL_UNIFORM_BUFFER, countOfLamps * 4 * sizeof(glm::vec4) + countOfLamps * 3 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, countOfLamps * 4 * sizeof(glm::vec4) + countOfLamps * 3 * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
     glBindBufferRange(GL_UNIFORM_BUFFER, bindingPoint, UBO, 0, countOfLamps * 4 * sizeof(glm::vec4) + countOfLamps * 3 * sizeof(float));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
@@ -25,7 +25,7 @@ void UniformBufferObject::preservePointLight(int countOfLamps)
 void UniformBufferObject::preserveDirectionalLight()
 {
     glBindBuffer(GL_UNIFORM_BUFFER, UBO);
-    glBufferData(GL_UNIFORM_BUFFER, 4 * sizeof(glm::vec4), NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, 4 * sizeof(glm::vec4), nullptr, GL_DYNAMIC_DRAW);
     glBindBufferRange(GL_UNIFORM_BUFFER, bindingPoint, UBO, 0, 4 * sizeof(glm::vec4));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
@@ -33,7 +33,7 @@ void UniformBufferObject::preserveDirectionalLight()
 void UniformBufferObject::preserveSpotLight()
 {
     glBindBuffer(GL_UNIFORM_BUFFER, UBO);
-    glBufferData(GL_UNIFORM_BUFFER, 5 * sizeof(glm::vec4) + 5 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, 5 * sizeof(glm::vec4) + 5 * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
     glBindBufferRange(GL_UNIFORM_BUFFER, bindingPoint, UBO, 0, 5 * sizeof(glm::vec4) + 5 * sizeof(float));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

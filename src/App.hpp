@@ -53,6 +53,7 @@
 #include "Primitives/Cube.hpp"
 #include "Primitives/Cylinder.hpp"
 #include "Primitives/CrossedPlane.hpp"
+#include "Primitives/Plane.hpp"
 
 #include "Include/filesystem.hpp"
 
@@ -91,7 +92,7 @@ private:
     Importer importer;
     ObjectScatterer* scatterer;
     std::vector<glm::mat4> places;
-    std::vector<glm::mat4> skinning = { glm::mat4(1.0f) };
+    std::vector<glm::mat4> rigging = { glm::mat4(1.0f) };
     std::vector<glm::mat4> groundBillboard;
     std::vector<glm::mat4> leafBillboard;
     glm::mat4 projection;
@@ -115,7 +116,7 @@ private:
     UniformBufferObject* directionUbo;
     UniformBufferObject* spotUbo;
     ShaderStorageBuffer* modelMatrixes;
-    ShaderStorageBuffer* skinningMatrixes;
+    ShaderStorageBuffer* riggingMatrixes;
     ShaderStorageBuffer* groundBillboardMatrixes;
     ShaderStorageBuffer* leafBillboardMatrixes;
 

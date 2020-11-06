@@ -22,12 +22,12 @@ class RiggedMesh : public Mesh
 private:
     void setup();
     std::vector<InstanceInfo> instanceData;
-    std::vector<glm::vec4> skinning;
+    std::vector<glm::vec4> rigging;
     GLuint instanceVBO;
-    GLuint skinningVBO;
+    GLuint riggingVBO;
 
 public:
-    RiggedMesh(std::vector<VertexPNT> vertexData, std::vector<GLuint> indices, std::vector<glm::vec4> skinning, std::vector<InstanceInfo> instanceData);
+    RiggedMesh(std::vector<VertexPNT> vertexData, std::vector<GLuint> indices, std::vector<glm::vec4> rigging, std::vector<InstanceInfo> instanceData);
     void setInstanceInfo(std::vector<InstanceInfo> instanceData);
     virtual void draw(int count);
     ~RiggedMesh();

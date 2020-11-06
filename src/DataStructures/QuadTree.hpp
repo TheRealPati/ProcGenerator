@@ -18,10 +18,10 @@ private:
     bool hasNode = false;
     bool divided = false;
 
-    QuadTree* topLeftTree; 
-    QuadTree* topRightTree; 
-    QuadTree* botLeftTree; 
-    QuadTree* botRightTree; 
+    QuadTree* topLeftTree = nullptr; 
+    QuadTree* topRightTree = nullptr; 
+    QuadTree* botLeftTree = nullptr; 
+    QuadTree* botRightTree = nullptr; 
 
 public:
     QuadTree(float topLeftX, float topLeftZ, float botRightX, float botRightZ);

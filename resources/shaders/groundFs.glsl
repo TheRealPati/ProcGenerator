@@ -56,11 +56,6 @@ layout (std140, binding = 3) uniform SpotLights
     SpotLight spotLight;
 };
 
-struct Camera 
-{
-    vec3 position;
-};
-
 struct Texture 
 {
     sampler2D texMap;
@@ -71,7 +66,7 @@ in vec3 modelPosition;
 in vec2 texCoords;
 
 uniform Material material;
-uniform Camera camera;
+uniform vec3 camera;
 uniform Texture texture1;
 uniform Texture texture2;
 uniform Texture texture3;
@@ -86,7 +81,7 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 viewDir);
 vec3 calcTexFromHeight();
 
 void main(){
-    vec3 viewDir = normalize(camera.position - modelPosition);
+    vec3 viewDir = normalize(camera - modelPosition);
     
     vec3 result = calcDirectionLight(directionLight, normal, viewDir);
     for(int i = 0; i < 4; i++)

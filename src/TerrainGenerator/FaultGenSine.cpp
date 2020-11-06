@@ -19,14 +19,6 @@ void FaultGenSine::modifyTerrain(std::vector<VertexPNT>& vertices)
 	    float diagonal = sqrt(surfaceSideSize + surfaceSideSize);
 	    float c = this->rand() * surfaceSideSize/density - surfaceSideSize/density/2;
 
-
-        /* for (auto& vertex: vertices){
-            float distance = fabs(a*vertex.position.x + b*vertex.position.z - c);
-		    if (distance < 5.0f){
-                //vertex.position.y += 0.5f*cos(0.3*distance);
-                //vertex.position.y += 1/cosh(distance);
-            }
-        } */
         for (auto& vertex: vertices){
             float distance = a*vertex.position.x + b*vertex.position.z - c;
 		    if (fabs(distance) < 1.56f){

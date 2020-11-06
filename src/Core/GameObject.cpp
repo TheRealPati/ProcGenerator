@@ -1,9 +1,6 @@
 #include "GameObject.hpp"
 
-GameObject::GameObject()
-{
-
-}
+GameObject::GameObject(){}
 
 void GameObject::draw(Camera* camera)
 {

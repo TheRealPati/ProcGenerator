@@ -81,11 +81,11 @@ GameObject* LodManager::getObject(int numOfPipe, bool highPoly)
     }
     else{
         if(numOfPipe == 2)
-            return highTwoObj;
+            return lowTwoObj;
         else if(numOfPipe == 3)
-            return highThreeObj;
+            return lowThreeObj;
         else
-            return highFourObj;
+            return lowFourObj;
     }
 }
 

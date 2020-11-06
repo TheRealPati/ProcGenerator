@@ -10,7 +10,6 @@ void CircleGen::modifyTerrain(std::vector<VertexPNT>& vertices)
 { 
     float displacement = 1.0f;
     int iterationLevel = 1000;
-    //int iterationLevel = 5;
     float circleSize = 8.0f;
 
     for(int i = 0; i<iterationLevel; i++){
@@ -24,7 +23,6 @@ void CircleGen::modifyTerrain(std::vector<VertexPNT>& vertices)
                 vertex.position.y += displacement/2 + cos(0.125*distance*3.14f)*displacement/2;
             }
         }
-        //displacement *= 0.98f;
         displacement -= 0.001f;
     }
 }

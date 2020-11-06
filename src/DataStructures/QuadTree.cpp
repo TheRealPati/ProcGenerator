@@ -3,11 +3,11 @@
 
 QuadTree::QuadTree(float topLeftX, float topLeftZ, float botRightX, float botRightZ) 
 { 
-    node = NULL;
-    topLeftTree  = NULL;
-    topRightTree = NULL;
-    botLeftTree  = NULL;
-    botRightTree = NULL;
+    node = nullptr;
+    topLeftTree  = nullptr;
+    topRightTree = nullptr;
+    botLeftTree  = nullptr;
+    botRightTree = nullptr;
     this->topLeftX = topLeftX; 
     this->topLeftZ = topLeftZ; 
     this->botRightX = botRightX; 
@@ -29,7 +29,7 @@ void QuadTree::divide()
 
 void QuadTree::insert(PN *node) 
 { 
-    if (node == NULL)
+    if (node == nullptr)
         return;
 
     if (!inBoundary(node->position.x, node->position.z)) 
@@ -95,12 +95,12 @@ bool QuadTree::inBoundary(float x, float z)
 
 QuadTree::~QuadTree()
 {
-    if(topLeftTree != NULL)
+    if(topLeftTree != nullptr)
         delete topLeftTree;
-    if(topRightTree != NULL)
+    if(topRightTree != nullptr)
         delete topRightTree;
-    if(botLeftTree != NULL)
+    if(botLeftTree != nullptr)
         delete botLeftTree;
-    if(botRightTree != NULL)
+    if(botRightTree != nullptr)
         delete botRightTree;
 }

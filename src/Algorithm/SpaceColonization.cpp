@@ -57,7 +57,7 @@ void SpaceColonization::leafGrow(std::vector<ColonBranch*>& generatedBranches)
     //First leaf found, scattering phase
     for(unsigned int i = 0; i < points.size(); i++)
     {
-        ColonBranch* closest = NULL;
+        ColonBranch* closest = nullptr;
         glm::vec3 pointPos(points[i].position.x, points[i].position.y, points[i].position.z);
         float closestDistance = maxDistance;
         for(ColonBranch* branch : generatedBranches)
@@ -66,7 +66,7 @@ void SpaceColonization::leafGrow(std::vector<ColonBranch*>& generatedBranches)
             if(distance < minDistance)
             {
                 killable.emplace_back(i);
-                closest = NULL;
+                closest = nullptr;
                 break;
             }
             else if(distance <= closestDistance)
@@ -76,7 +76,7 @@ void SpaceColonization::leafGrow(std::vector<ColonBranch*>& generatedBranches)
             }
         }
 
-        if(closest != NULL)
+        if(closest != nullptr)
         {
             glm::vec3 leafDir = glm::normalize(pointPos - closest->pos);
             glm::vec3 newDir = glm::normalize(leafDir + closest->direction);

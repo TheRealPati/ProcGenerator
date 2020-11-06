@@ -57,24 +57,19 @@ layout (std140, binding = 3) uniform SpotLights
     SpotLight spotLight;
 };
 
-struct Camera 
-{
-    vec3 position;
-};
-
 in vec3 normal;
 in vec3 modelPosition;
 in vec2 texCoords;
 
 uniform Material material;
-uniform Camera camera;
+uniform vec3 camera;
 
 vec3 calcDirectionLight(DirectionLight light, vec3 normal, vec3 viewDir);
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 viewDir);
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 viewDir);
 
 void main(){
-    vec3 viewDir = normalize(camera.position - modelPosition);
+    vec3 viewDir = normalize(camera - modelPosition);
     
     vec3 result = calcDirectionLight(directionLight, normal, viewDir);
     for(int i = 0; i < 4; i++)

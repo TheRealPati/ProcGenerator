@@ -22,7 +22,7 @@ void Forest::fillInitialDirections(ColonBranch* branch)
     }
 }
 
-void Forest::populate(unsigned int maxSideSize, std::vector<glm::mat4>& places, std::vector<glm::mat4>& skinning, std::vector<glm::mat4>& leafBillboard)
+void Forest::populate(unsigned int maxSideSize, std::vector<glm::mat4>& places, std::vector<glm::mat4>& rigging, std::vector<glm::mat4>& leafBillboard)
 {
     RegionSeeder seeder = RegionSeeder(randomizer, 200);
     glm::vec3 upVector = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -43,24 +43,36 @@ void Forest::populate(unsigned int maxSideSize, std::vector<glm::mat4>& places, 
         for(ColonBranch* branch : branches)
         {
             this->fillInitialDirections(branch);
-            if(branch->parent != NULL)
+            if(branch->parent != nullptr)
                 branch->parent->childDirections.emplace_back(glm::normalize(branch->pos - branch->parent->pos));
         }
 
+        bool firstBranchingFound = false;
         for(ColonBranch* branch : branches)
         {
-
             glm::mat4 translateMat = glm::translate(glm::mat4(1.0f), branch->pos);
             glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-            if(branch->childrenCount == 0){
-                for(int i = 0; i < 5; i++){
+            if(!firstBranchingFound && branch->childrenCount == 2) {
+                firstBranchingFound = true;
+            }
+            
+            int round = 0;
+            if(branch->childrenCount == 0)
+                round = 5;
+            else
+                round = 3;
+
+            if(firstBranchingFound){
+                for(int i = 0; i < round; i++){
                     glm::mat4 randRot = scatterer->calcRotMat(upVector, glm::vec3(randomizer.randCenterEqually(), randomizer.randCenterEqually(), randomizer.randCenterEqually()));
-                    leafBillboard.emplace_back(translateMat * randRot);
+                    float scale = randomizer.rand() + 0.5f;
+                    glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale));
+                    leafBillboard.emplace_back(translateMat * randRot * scaleMat);
                 }
             }
 
-            mutateBranch(branch, places, skinning);
+            mutateBranch(branch, places, rigging);
 
             places.emplace_back(translateMat * scaleMat /** rotMat*/);
         }
@@ -73,17 +85,14 @@ std::vector<glm::vec3> calcNearestAngles(ColonBranch* branch)
 
     //Last pieces
     if(branch->childrenCount == 0){
-        //fprintf(stderr, "LAST PIECE\n");
         branch->childDirections.push_back(branch->direction);
     }
 
     //Parent side
-    if(branch->parent != NULL){
-        //fprintf(stderr, "PARENT\n");
+    if(branch->parent != nullptr){
         branch->childDirections.push_back(glm::normalize(branch->parent->pos - branch->pos));
     }
     else{
-        //fprintf(stderr, "NINCS PARENT\n");
         branch->childDirections.push_back(-branch->direction);
     }
 
@@ -91,16 +100,13 @@ std::vector<glm::vec3> calcNearestAngles(ColonBranch* branch)
     for(unsigned int i = 0; i < branch->directions.size(); i++)
     {
         glm::vec3& dir = branch->directions[i];
-        //fprintf(stderr, "%d -DIK PIECE\n", i);
 
         for(unsigned int j = 0; j < branch->childDirections.size(); j++)
         {
             glm::vec3& childDir = branch->childDirections[j];
             angleMatrix.push_back(std::tuple<float, int, int>(acos(glm::dot(childDir, dir)), i, j));
-            //fprintf(stderr, "%f\n", acos(glm::dot(childDir, dir)));
         }
     }
-    //fprintf(stderr, "\n\n\n");
 
     //Sorrendezes
     const int numOfDirections = branch->directions.size();
@@ -109,12 +115,7 @@ std::vector<glm::vec3> calcNearestAngles(ColonBranch* branch)
         return std::get<0>(t1) > std::get<0>(t2);
     }); 
 
-    for (int i = 0; i < angleMatrix.size(); i++){
-        //fprintf(stderr, "[ %f, %d, %d ]\n", std::get<0>(angleMatrix[i]), std::get<1>(angleMatrix[i]), std::get<2>(angleMatrix[i]));
-    } 
-
     std::vector<int> found(numOfDirections);
-    //std::vector<int> branchChooseOrder(numOfDirections);
     std::vector<int> childDirChooseOrder(numOfDirections);
     int i=0;
 
@@ -124,7 +125,6 @@ std::vector<glm::vec3> calcNearestAngles(ColonBranch* branch)
         //Correct order
         found[std::get<2>(angleTuple)] += 1;
         if(found[std::get<2>(angleTuple)] == numOfDirections){
-            //fprintf(stderr, "%d\n", std::get<1>(angleTuple));
             childDirChooseOrder[i] = std::get<2>(angleTuple);
             i++;
         }
@@ -134,21 +134,16 @@ std::vector<glm::vec3> calcNearestAngles(ColonBranch* branch)
     }
 
     for (int i = 0; i < numOfDirections; i++){
-        //fprintf(stderr, "{");
         for (int j = 0; j < numOfDirections; j++){
-            //fprintf(stderr, " %d ", splittedBranches[i][j]);
         } 
-        //fprintf(stderr, "}\n");
     }
 
     std::vector<glm::vec3> result(numOfDirections);
     std::vector<int> outOfOrder = {};
     //Bejárás hátulról
-    //Itt valami nem stimmel
     //Ha egy childdirt mindannyian megtaláltak akkor a legjobb direction megkapja - Ez a V1
     for(int i = 0; i < numOfDirections; i++){
         int choosenIndex = childDirChooseOrder[i];
-        //fprintf(stderr, "INDEX: %d\n", choosenIndex);
         bool found = false;
         for(int j = splittedBranches[choosenIndex].size() - 1; j >= 0 ; j--){
             auto it = std::find(outOfOrder.begin(), outOfOrder.end(), splittedBranches[choosenIndex][j]); 
@@ -156,7 +151,6 @@ std::vector<glm::vec3> calcNearestAngles(ColonBranch* branch)
                 found = true;
                 int originalBranchIndex = splittedBranches[choosenIndex][j];
                 outOfOrder.push_back(originalBranchIndex);
-                //fprintf(stderr, "BESZÚROM: (%d - %d)\n", originalBranchIndex, choosenIndex);
                 result[originalBranchIndex] = branch->childDirections[choosenIndex];
             }
         }
@@ -170,7 +164,7 @@ glm::mat4 Forest::scaleEndPiece(glm::mat4& mat)
     return glm::scale(mat, glm::vec3(0.35f));
 }
 
-void Forest::mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, std::vector<glm::mat4>& skinning)
+void Forest::mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, std::vector<glm::mat4>& rigging)
 {
     if(branch->childrenCount < 5){
         InstanceInfo info;
@@ -189,15 +183,15 @@ void Forest::mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, s
             }
         
             if(i == 0)
-                info.boneIndices.x = skinning.size();
+                info.boneIndices.x = rigging.size();
             else if(i == 1)
-                info.boneIndices.y = skinning.size();
+                info.boneIndices.y = rigging.size();
             else if(i == 2)
-                info.boneIndices.z = skinning.size();
+                info.boneIndices.z = rigging.size();
             else if(i == 3)
-                info.boneIndices.w = skinning.size();
+                info.boneIndices.w = rigging.size();
 
-            skinning.emplace_back(rotMat);
+            rigging.emplace_back(rotMat);
             branch->leafCount++;
         }
 
@@ -224,7 +218,4 @@ std::vector<InstanceInfo> Forest::getInstanceInfo(std::string key)
     return pieceInstanceInfo.at(key);
 }
 
-Forest::~Forest()
-{
-    
-}
+Forest::~Forest(){}

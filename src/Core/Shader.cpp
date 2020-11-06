@@ -31,12 +31,12 @@ std::string Shader::loadContent(std::string filename)
 GLuint Shader::compileShaders(const GLchar* vertexProgram, const GLchar* fragmentProgram)
 {
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexProgram, NULL);
+    glShaderSource(vertexShader, 1, &vertexProgram, nullptr);
     glCompileShader(vertexShader);
     check(vertexShader);
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentProgram, NULL);
+    glShaderSource(fragmentShader, 1, &fragmentProgram, nullptr);
     glCompileShader(fragmentShader);
     check(fragmentShader);
 
@@ -60,7 +60,7 @@ void Shader::check(GLuint program)
     glGetShaderiv(program, GL_COMPILE_STATUS, &status);
     if(status != GL_TRUE){
         char errorBuffer[1024];
-        glGetShaderInfoLog(program, 1024, NULL, errorBuffer);
+        glGetShaderInfoLog(program, 1024, nullptr, errorBuffer);
         fprintf(stderr, "%s\n", errorBuffer);
     }
 }

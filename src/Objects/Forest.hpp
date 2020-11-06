@@ -33,9 +33,9 @@ private:
 
 public:
     Forest(Randomizer& randomizer, ObjectScatterer* scatterer, unsigned int treeCount);
-    void populate(unsigned int maxSideSize, std::vector<glm::mat4>& places, std::vector<glm::mat4>& skinning, std::vector<glm::mat4>& leafBillboard);
+    void populate(unsigned int maxSideSize, std::vector<glm::mat4>& places, std::vector<glm::mat4>& rigging, std::vector<glm::mat4>& leafBillboard);
 
-    void mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, std::vector<glm::mat4>& skinning);
+    void mutateBranch(ColonBranch* branch, std::vector<glm::mat4>& places, std::vector<glm::mat4>& rigging);
 
     glm::mat4 scaleEndPiece(glm::mat4& mat);
     void fillInitialDirections(ColonBranch* branch);

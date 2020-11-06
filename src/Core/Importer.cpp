@@ -1,9 +1,6 @@
 #include "Importer.hpp"
 
-Importer::Importer()
-{
-
-}
+Importer::Importer(){}
 
 void Importer::loadModel(std::string path, ModelType type)
 {
@@ -175,7 +172,4 @@ std::vector<glm::vec4> Importer::getWeights()
     return weights;
 }
 
-Importer::~Importer()
-{
-
-}
+Importer::~Importer(){}
